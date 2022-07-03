@@ -1,8 +1,8 @@
 package com.example.backlog.viewmodel
 
 import androidx.lifecycle.*
-import com.example.backlog.model.dao.GameDao
-import com.example.backlog.model.entities.Game
+import com.example.backlog.database.dao.GameDao
+import com.example.backlog.database.entities.Game
 import kotlinx.coroutines.launch
 
 class GameViewModel(private val dao: GameDao) : ViewModel() {
@@ -17,12 +17,3 @@ class GameViewModel(private val dao: GameDao) : ViewModel() {
     }
 }
 
-class GameViewModelFactory(private val dao: GameDao) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(GameViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return GameViewModel(dao) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

@@ -1,10 +1,10 @@
-package com.example.backlog.model.dao
+package com.example.backlog.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.backlog.model.entities.Game
+import com.example.backlog.database.entities.Game
 import kotlinx.coroutines.flow.Flow
 
 @Dao

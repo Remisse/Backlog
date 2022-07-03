@@ -1,4 +1,4 @@
-package com.example.backlog.model.entities
+package com.example.backlog.database.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Game(
-    @PrimaryKey val uid: Int,
+    @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     val title: String,
     val platform: String,
     val status: String,
