@@ -2,12 +2,10 @@ package com.example.backlog.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.backlog.database.dao.GameDao
 import com.example.backlog.database.dao.TaskDao
-import com.example.backlog.database.entities.Game
-import com.example.backlog.database.entities.Task
+import com.example.backlog.database.entity.Game
+import com.example.backlog.database.entity.Task
 
 @Database(
     entities = [Game::class, Task::class],

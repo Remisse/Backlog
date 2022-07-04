@@ -1,4 +1,4 @@
-package com.example.backlog.database.entities
+package com.example.backlog.database.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -14,5 +14,6 @@ data class Task(
     @PrimaryKey(autoGenerate = true) val uid: Int? = null,
     val description: String,
     val gameId: Int,
-    val deadline: Long?
+    val deadline: Long?,
+    val status: String
 )

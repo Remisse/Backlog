@@ -2,7 +2,7 @@ package com.example.backlog.viewmodel
 
 import androidx.lifecycle.*
 import com.example.backlog.database.dao.GameDao
-import com.example.backlog.database.entities.Game
+import com.example.backlog.database.entity.Game
 import kotlinx.coroutines.launch
 
 class GameViewModel(private val dao: GameDao) : ViewModel() {

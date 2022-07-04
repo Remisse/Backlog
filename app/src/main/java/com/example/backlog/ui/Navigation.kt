@@ -1,68 +1,108 @@
 package com.example.backlog.ui
 
-import androidx.compose.material.*
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.navigation
 import com.example.backlog.AppContainer
-import com.example.backlog.ui.theme.BacklogTheme
 import com.example.backlog.Screen
-import com.example.backlog.viewmodel.GameViewModel
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun NavigationSystem(appContainer: AppContainer) {
-    val navController = rememberNavController()
-
-    NavHost(navController, startDestination = Screen.Games.route) {
-        composable(Screen.Games.route) { BacklogScreen(navController,
-            viewModel(factory = appContainer.gameViewModelFactory)) }
-        composable(Screen.Tasks.route) { TasksScreen(navController) }
-        composable(Screen.Profile.route) { ProfileScreen(navController) }
-
-        composable(Screen.GameCreation.route) { GameCreationScreen(navController,
-            viewModel(factory = appContainer.gameViewModelFactory)) }
+fun NavigationSystem(navController: NavHostController, appContainer: AppContainer,
+                     paddingValues: PaddingValues) {
+    AnimatedNavHost(
+        navController = navController,
+        startDestination = "main"
+    ) {
+        mainGraph(navController, appContainer)
+        gameInsertionFormGraph(navController, appContainer)
+        taskCreationFormGraph(navController, appContainer)
     }
 }
 
-@Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    val screens = listOf(Screen.Games, Screen.Tasks, Screen.Profile)
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.mainGraph(navController: NavHostController, appContainer: AppContainer) {
+    val fabModifier = Modifier.offset(y = (-64).dp)
 
-    BacklogTheme() {
-        BottomNavigation(backgroundColor = MaterialTheme.colors.background) {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
-
-            screens.forEach() { screen ->
-                BottomNavigationItem(
-                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                    onClick = {
-                        navController.navigate(screen.route) {
-                            // Pop up to the start destination of the graph to
-                            // avoid building up a large stack of destinations
-                            // on the back stack as users select items
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            // Avoid multiple copies of the same destination when
-                            // reselecting the same item
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
-                        }
-                    },
-                    label = { Text(stringResource(screen.resourceId)) },
-                    icon = { Icon(imageVector = screen.icon, contentDescription = null) }
-                )
-            }
+    navigation(
+        startDestination = Screen.Games.route,
+        route = "main"
+    ) {
+        composable(
+            route = Screen.Games.route,
+            enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+            exitTransition = { fadeOut() }
+        ) { BacklogScreen(
+            onCreateButtonClick = { navController.navigate(Screen.GameCreation.route) },
+            onOnlineSearchButtonClick = { /* TODO */ },
+            fabModifier = fabModifier,
+            gameViewModel = viewModel(factory = appContainer.gameViewModelFactory)
+        ) }
+        composable(
+            route = Screen.Tasks.route,
+            enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+            exitTransition = { fadeOut() }
+        ) {
+            TaskScreen(
+                onCreateClick = { navController.navigate(Screen.TaskCreation.route) },
+                fabModifier = fabModifier,
+                taskViewModel = viewModel(factory = appContainer.taskViewModelFactory)
+            )
         }
+        composable(
+            route = Screen.Profile.route,
+            enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+            exitTransition = { fadeOut() }
+        ) {
+            ProfileScreen()
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.gameInsertionFormGraph(navController: NavHostController, appContainer: AppContainer) {
+    navigation(
+        startDestination = Screen.GameCreation.route,
+        route = "game_insertion"
+    ) {
+        composable(
+            route = Screen.GameCreation.route,
+            enterTransition = { slideInVertically() },
+            exitTransition = { fadeOut() }
+        ) { GameCreationScreen(
+            onEntryAddSuccess = { navController.navigateUp() },
+            onDialogSubmitClick = { navController.navigateUp() },
+            gameViewModel = viewModel(factory = appContainer.gameViewModelFactory)
+        ) }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.taskCreationFormGraph(navController: NavHostController, appContainer: AppContainer) {
+    navigation(
+        startDestination = Screen.TaskCreation.route,
+        route = "task_insertion"
+    ) {
+        composable(
+            route = Screen.TaskCreation.route,
+            enterTransition = { slideInVertically() },
+            exitTransition = { fadeOut() }
+        ) { TaskCreationScreen(
+            onEntryAddSuccess = { navController.navigateUp() },
+            onDialogSubmitClick = { navController.navigateUp() },
+            taskViewModel = viewModel(factory = appContainer.taskViewModelFactory)
+        ) }
     }
 }

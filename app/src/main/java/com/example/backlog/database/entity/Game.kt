@@ -1,4 +1,4 @@
-package com.example.backlog.database.entities
+package com.example.backlog.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

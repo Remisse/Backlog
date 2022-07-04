@@ -1,10 +1,7 @@
 package com.example.backlog.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.example.backlog.database.entities.Game
+import androidx.room.*
+import com.example.backlog.database.entity.Game
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,4 +12,7 @@ interface GameDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(game: Game)
+
+    @Delete
+    suspend fun delete(game: Game)
 }

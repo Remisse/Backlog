@@ -8,6 +8,7 @@ class BacklogApplication : Application() {
 
     private val database: BacklogDatabase by lazy {
         Room.databaseBuilder(applicationContext, BacklogDatabase::class.java, "backlog_database")
+            // TODO Delete this
             .fallbackToDestructiveMigration()
             .build()
     }

@@ -7,17 +7,25 @@
 
     <string name="insert_game_title">Title</string>
     <string name="insert_game_platform">Platform</string>
-    <string name="insert_topbar">Add a game</string>
+    <string name="insert_topbar">Add game</string>
+    <string name="insert_button_add">Add to backlog</string>
+    <string name="insert_button_cancel">Cancel</string>
+    <string name="insert_cancel_dialog">Are you sure you want to return to the backlog screen? All
+        inserted data will be lost.</string>
+    <string name="insert_status_label">Status</string>
+    <string name="insert_back_dialog_heading">Return to backlog screen?</string>
+    <string name="insert_back_dialog_cancel">Stay</string>
+    <string name="insert_back_dialog_submit">Return to backlog</string>
 
     <string name="status_not_started">Not yet started</string>
     <string name="status_playing">Currently playing</string>
     <string name="status_completed">Completed</string>
     <string name="status_dropped">Dropped</string>
-    <string name="insert_button_add">Add to backlog</string>
-    <string name="insert_button_cancel">Cancel</string>
-    <string name="insert_cancel_dialog">Are you sure you want to return to the backlog screen? All inserted data will be lost.</string>
-    <string name="insert_status_label">Status</string>
-    <string name="insert_back_dialog_heading">Return to backlog screen?</string>
-    <string name="insert_back_dialog_cancel">Stay</string>
-    <string name="insert_back_dialog_submit">Return to backlog</string>
+
+    <string name="backlog_fab_add">Add game</string>
+    <string name="backlog_fab_create">Create manually</string>
+    <string name="backlog_fab_onlinesearch">Search online</string>
+
+    <string name="task_fab_add">Create task</string>
+    <string name="task_card_icon_deadline">Deadline</string>
 </resources>
