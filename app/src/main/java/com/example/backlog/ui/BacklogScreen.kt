@@ -17,7 +17,7 @@ import com.example.backlog.database.entity.Game
 import com.example.backlog.viewmodel.GameViewModel
 
 @Composable
-fun ItemCardList(cards: List<Game>, padding: PaddingValues) {
+private fun ItemCardList(cards: List<Game>, padding: PaddingValues) {
     val textModifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
 
     LazyColumn(modifier = Modifier.padding(padding)) {
@@ -38,7 +38,7 @@ fun ItemCardList(cards: List<Game>, padding: PaddingValues) {
 }
 
 @Composable
-fun BacklogMiniFabs(onOnlineSearchClick: () -> Unit, onCreateClick: () -> Unit) {
+private fun BacklogMiniFabs(onOnlineSearchClick: () -> Unit, onCreateClick: () -> Unit) {
     val subButtonHeight = 36.dp
     val subButtonFontSize = 9.sp
     val subButtonIconSize = 16.dp

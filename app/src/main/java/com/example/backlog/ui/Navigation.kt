@@ -33,12 +33,12 @@ fun NavigationSystem(navController: NavHostController, appContainer: AppContaine
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.mainGraph(navController: NavHostController, appContainer: AppContainer) {
+private fun NavGraphBuilder.mainGraph(navController: NavHostController, appContainer: AppContainer) {
     val fabModifier = Modifier.offset(y = (-64).dp)
 
     navigation(
-        startDestination = Screen.Games.route,
-        route = "main"
+        route = "main",
+        startDestination = Screen.Games.route
     ) {
         composable(
             route = Screen.Games.route,
@@ -72,10 +72,10 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController, appContainer: Ap
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.gameInsertionFormGraph(navController: NavHostController, appContainer: AppContainer) {
+private fun NavGraphBuilder.gameInsertionFormGraph(navController: NavHostController, appContainer: AppContainer) {
     navigation(
         startDestination = Screen.GameCreation.route,
-        route = "game_insertion"
+        route = "game_creation_parent"
     ) {
         composable(
             route = Screen.GameCreation.route,
@@ -90,10 +90,10 @@ fun NavGraphBuilder.gameInsertionFormGraph(navController: NavHostController, app
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.taskCreationFormGraph(navController: NavHostController, appContainer: AppContainer) {
+private fun NavGraphBuilder.taskCreationFormGraph(navController: NavHostController, appContainer: AppContainer) {
     navigation(
         startDestination = Screen.TaskCreation.route,
-        route = "task_insertion"
+        route = "task_creation_parent"
     ) {
         composable(
             route = Screen.TaskCreation.route,
@@ -102,6 +102,7 @@ fun NavGraphBuilder.taskCreationFormGraph(navController: NavHostController, appC
         ) { TaskCreationScreen(
             onEntryAddSuccess = { navController.navigateUp() },
             onDialogSubmitClick = { navController.navigateUp() },
+            gameViewModel = viewModel(factory = appContainer.gameViewModelFactory),
             taskViewModel = viewModel(factory = appContainer.taskViewModelFactory)
         ) }
     }

@@ -8,6 +8,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -19,12 +20,16 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.backlog.R
 import com.example.backlog.Screen
 
 @Composable
@@ -63,27 +68,27 @@ fun ItemCard(topText: @Composable () -> Unit, subText: List<@Composable () -> Un
 }
 
 @Composable
-fun FormField(@StringRes res: Int, values: SnapshotStateMap<Int, String>, modifier: Modifier, shape: Shape) {
-    values.putIfAbsent(res, "")
+fun FormField(@StringRes res: Int, valueMap: SnapshotStateMap<Int, String>, modifier: Modifier, shape: Shape) {
+    valueMap.putIfAbsent(res, "")
 
     OutlinedTextField(
         modifier = modifier,
-        value = values[res].orEmpty(),
-        onValueChange = { values[res] = it },
+        value = valueMap[res].orEmpty(),
+        onValueChange = { valueMap[res] = it },
         label = { Text(stringResource(res)) },
         shape = shape
     )
 }
 
 @Composable
-fun FieldColumn(values: SnapshotStateMap<Int, String>, fieldsRes: List<Int>,
-                fieldModifier: Modifier, fieldShape: Shape
+fun FieldColumn(valueMap: SnapshotStateMap<Int, String>, fieldsRes: List<Int>,
+                modifier: Modifier, fieldShape: Shape, fieldModifier: Modifier
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(vertical = 8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+        modifier = modifier
     ) {
-        fieldsRes.forEach { FormField(res = it, values = values, fieldModifier, fieldShape) }
+        fieldsRes.forEach { FormField(res = it, valueMap = valueMap, fieldModifier, fieldShape) }
     }
 }
 
@@ -105,7 +110,7 @@ fun SearchBar(value: String, onValueChange: (String) -> Unit, modifier: Modifier
 }
 
 @Composable
-fun TopMenuBar(onMenuButtonClick: () -> Unit, modifier: Modifier) {
+fun TopMenuBar(@StringRes header: Int, onMenuButtonClick: () -> Unit, modifier: Modifier) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -120,7 +125,19 @@ fun TopMenuBar(onMenuButtonClick: () -> Unit, modifier: Modifier) {
             }) {
                 Icon(imageVector = Icons.Default.Menu, contentDescription = "")
             }
-            Text(text = stringResource(R.string.app_name), style = MaterialTheme.typography.h6)
+            Text(text = stringResource(header), style = MaterialTheme.typography.h6)
+        }
+    }
+}
+
+@Composable
+fun SubScreenTopBar(@StringRes heading: Int, onClick: () -> Unit) {
+    TopAppBar() {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onClick ) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+            }
+            Text(text = stringResource(heading), style = MaterialTheme.typography.h6)
         }
     }
 }
@@ -191,5 +208,48 @@ fun ActionsFab(@StringRes textRes: Int, icon: ImageVector, modifier: Modifier,
                 )
             },
         )
+    }
+}
+
+@Composable
+fun CancelDialog(onDismissRequest: () -> Unit, dialogContents: @Composable () -> Unit) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    ) {
+        Surface(shape = RoundedCornerShape(4.dp), modifier = Modifier.padding(8.dp)) {
+            dialogContents()
+        }
+    }
+}
+
+@Composable
+fun CancelDialogContent(@StringRes heading: Int, @StringRes description: Int, @StringRes stayRes: Int,
+                        @StringRes returnRes: Int, modifier: Modifier, onStayButtonClick: () -> Unit,
+                        onSubmitButtonClick: () -> Unit) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(heading),
+            style = MaterialTheme.typography.h6.plus(TextStyle(fontWeight = FontWeight.Bold)),
+            modifier = modifier
+        )
+        Text(
+            text = stringResource(description),
+            textAlign = TextAlign.Start,
+            modifier = modifier
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier) {
+            Button(
+                onClick = onStayButtonClick,
+                colors = ButtonDefaults.outlinedButtonColors()) {
+                Text(stringResource(stayRes).uppercase())
+            }
+            Button(onClick = onSubmitButtonClick) {
+                Text(stringResource(returnRes).uppercase())
+            }
+        }
     }
 }

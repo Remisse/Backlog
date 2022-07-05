@@ -6,13 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.backlog.ui.BottomNavigationBar
 import com.example.backlog.ui.NavigationSystem
@@ -41,7 +35,10 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {
                         if (showNavbar) {
-                            TopMenuBar(onMenuButtonClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth())
+                            val header = screens.find { it.route == navController.currentDestination?.route }
+                                ?.resourceId ?: R.string.app_name
+                            TopMenuBar(header = header, onMenuButtonClick = { /*TODO*/ },
+                                modifier = Modifier.fillMaxWidth())
                         }
                     },
                     bottomBar = { 

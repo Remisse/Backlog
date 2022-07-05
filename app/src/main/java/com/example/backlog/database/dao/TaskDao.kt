@@ -18,8 +18,6 @@ interface TaskDao {
     suspend fun insert(task: Task)
 
     @Query("SELECT T.*, G.title AS gameTitle " +
-            "FROM game G, task T " +
-            "WHERE G.uid == T.gameId " +
-            "GROUP BY G.title")
+            "FROM task T LEFT JOIN game G ON G.uid == T.gameId")
     fun getTasksByGame(): Flow<List<TaskWithGameTitle>>
 }

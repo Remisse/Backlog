@@ -14,6 +14,7 @@ data class Task(
     @PrimaryKey(autoGenerate = true) val uid: Int? = null,
     val description: String,
     val gameId: Int,
-    val deadline: Long?,
+    val deadlineDateEpochDay: Long?,
+    val deadlineTimeSeconds: Int?,
     val status: String
 )

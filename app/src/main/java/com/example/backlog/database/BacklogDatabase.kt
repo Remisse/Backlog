@@ -9,7 +9,7 @@ import com.example.backlog.database.entity.Task
 
 @Database(
     entities = [Game::class, Task::class],
-    version = 5
+    version = 6
 )
 abstract class BacklogDatabase() : RoomDatabase() {
 
