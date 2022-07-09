@@ -14,7 +14,6 @@ import com.example.backlog.ui.TopMenuBar
 import com.example.backlog.ui.getParentRoute
 import com.example.backlog.ui.theme.BacklogTheme
 import com.example.backlog.util.AppContainer
-import com.example.backlog.util.AppContainerImpl
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class MainActivity : ComponentActivity() {

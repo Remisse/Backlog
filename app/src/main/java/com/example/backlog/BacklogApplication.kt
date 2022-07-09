@@ -15,5 +15,10 @@ class BacklogApplication : Application() {
             .fallbackToDestructiveMigration()
             .build()
     }
-    val appContainer: AppContainer by lazy { AppContainerImpl(database, WorkManager.getInstance(this)) }
+    val appContainer: AppContainer by lazy {
+        AppContainerImpl(
+            database,
+            WorkManager.getInstance(this)
+        )
+    }
 }
