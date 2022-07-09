@@ -5,15 +5,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -30,65 +28,66 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.backlog.R
 import com.example.backlog.Screen
 
 @Composable
-fun ItemCard(topText: @Composable () -> Unit, subText: List<@Composable () -> Unit>,
-             hiddenText: List<@Composable () -> Unit>) {
+fun ItemCard(modifier: Modifier, topText: @Composable () -> Unit, subText: @Composable () -> Unit,
+             hiddenText: (@Composable () -> Unit)?, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
     val isClicked = remember { mutableStateOf(false) }
     val buttonIcon = if (!isClicked.value) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
 
     Card(
         backgroundColor = MaterialTheme.colors.background,
-        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-    ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .animateContentSize()
-        ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 2.dp)
-            ) {
-                topText()
-                subText.forEach { it() }
-                if (isClicked.value) {
-                    hiddenText.forEach { it() }
-                }
-            }
-            IconButton(
-                onClick = { isClicked.value = !isClicked.value }
-            ) {
-                Icon(imageVector = buttonIcon, contentDescription = null)
-            }
-        }
-    }
-}
-
-@Composable
-fun FormField(@StringRes res: Int, valueMap: SnapshotStateMap<Int, String>, modifier: Modifier, shape: Shape) {
-    valueMap.putIfAbsent(res, "")
-
-    OutlinedTextField(
-        modifier = modifier,
-        value = valueMap[res].orEmpty(),
-        onValueChange = { valueMap[res] = it },
-        label = { Text(stringResource(res)) },
-        shape = shape
-    )
-}
-
-@Composable
-fun FieldColumn(valueMap: SnapshotStateMap<Int, String>, fieldsRes: List<Int>,
-                modifier: Modifier, fieldShape: Shape, fieldModifier: Modifier
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         modifier = modifier
     ) {
-        fieldsRes.forEach { FormField(res = it, valueMap = valueMap, fieldModifier, fieldShape) }
+        Surface(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .animateContentSize()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 2.dp)
+                ) {
+                    topText()
+                    subText()
+                    if (isClicked.value) {
+                        hiddenText?.invoke()
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+                        ) {
+                            Button(onClick = onEditClick) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+                                Text(stringResource(R.string.card_edit_item).uppercase())
+                            }
+                            OutlinedButton(onClick = onDeleteClick) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Delete,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+                                Text(stringResource(R.string.card_delete_item).uppercase())
+                            }
+                        }
+                    }
+                }
+                IconButton(
+                    onClick = { isClicked.value = !isClicked.value },
+                ) {
+                    Icon(imageVector = buttonIcon, contentDescription = null)
+                }
+            }
+        }
     }
 }
 
@@ -186,13 +185,12 @@ fun ActionsFab(@StringRes textRes: Int, icon: ImageVector, modifier: Modifier,
         modifier = modifier
     ) {
         AnimatedVisibility(
-            visible = isClicked.value,
-            enter = slideInHorizontally(initialOffsetX = { it * 3}),
-            exit = slideOutHorizontally(targetOffsetX = { it * 4})
+            visible = isClicked.value
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.animateContentSize()
             ) {
                 miniFabs()
             }
@@ -212,13 +210,13 @@ fun ActionsFab(@StringRes textRes: Int, icon: ImageVector, modifier: Modifier,
 }
 
 @Composable
-fun CancelDialog(onDismissRequest: () -> Unit, dialogContents: @Composable () -> Unit) {
+fun CancelDialog(onDismissRequest: () -> Unit, dialogContent: @Composable () -> Unit) {
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ) {
-        Surface(shape = RoundedCornerShape(4.dp), modifier = Modifier.padding(8.dp)) {
-            dialogContents()
+        Surface(shape = LookAndFeel.DialogSurfaceShape) {
+            dialogContent()
         }
     }
 }
@@ -228,8 +226,8 @@ fun CancelDialogContent(@StringRes heading: Int, @StringRes description: Int, @S
                         @StringRes returnRes: Int, modifier: Modifier, onStayButtonClick: () -> Unit,
                         onSubmitButtonClick: () -> Unit) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = LookAndFeel.DialogVerticalArrangement,
+        horizontalAlignment = LookAndFeel.DialogHorizontalAlignment
     ) {
         Text(
             text = stringResource(heading),
@@ -241,7 +239,10 @@ fun CancelDialogContent(@StringRes heading: Int, @StringRes description: Int, @S
             textAlign = TextAlign.Start,
             modifier = modifier
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = modifier) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier
+        ) {
             Button(
                 onClick = onStayButtonClick,
                 colors = ButtonDefaults.outlinedButtonColors()) {
@@ -249,6 +250,39 @@ fun CancelDialogContent(@StringRes heading: Int, @StringRes description: Int, @S
             }
             Button(onClick = onSubmitButtonClick) {
                 Text(stringResource(returnRes).uppercase())
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteDialog(onDismissRequest: () -> Unit, onConfirmDeleteClick: () -> Unit,
+                 onCancelClick: () -> Unit, @StringRes body: Int) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+    ) {
+        Surface(shape = LookAndFeel.DialogSurfaceShape) {
+            Column(
+                verticalArrangement = LookAndFeel.DialogVerticalArrangement,
+                horizontalAlignment = LookAndFeel.DialogHorizontalAlignment
+            ) {
+                Text(
+                    text = stringResource(R.string.dialog_warning_heading),
+                    style = MaterialTheme.typography.h6
+                )
+                Text(
+                    text = stringResource(body),
+                    style = MaterialTheme.typography.body2
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(onClick = onCancelClick) {
+                        Text(stringResource(R.string.insert_button_cancel).uppercase())
+                    }
+                    Button(onClick = onConfirmDeleteClick) {
+                        Text(stringResource(R.string.card_delete_item).uppercase())
+                    }
+                }
             }
         }
     }

@@ -13,21 +13,24 @@ import com.example.backlog.ui.NavigationSystem
 import com.example.backlog.ui.TopMenuBar
 import com.example.backlog.ui.getParentRoute
 import com.example.backlog.ui.theme.BacklogTheme
+import com.example.backlog.util.AppContainerImpl
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var container: AppContainer
+    private lateinit var container: AppContainerImpl
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        container = (application as BacklogApplication).appContainer
 
+
+        container = (application as BacklogApplication).appContainer
         setContent {
             val screens = listOf(Screen.Games, Screen.Tasks, Screen.Profile)
             val navController = rememberAnimatedNavController()
+            val startingDestination = "main"
 
             val showNavbar = getParentRoute(entry = navController.currentBackStackEntryAsState()) == "main"
 
@@ -47,7 +50,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { padding ->
-                    NavigationSystem(navController, container, padding)
+                    NavigationSystem(navController, container, padding, startingDestination)
                 }
             }
         }

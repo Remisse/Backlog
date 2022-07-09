@@ -2,7 +2,9 @@ package com.example.backlog
 
 import android.app.Application
 import androidx.room.Room
-import com.example.backlog.database.BacklogDatabase
+import androidx.work.WorkManager
+import com.example.backlog.model.database.BacklogDatabase
+import com.example.backlog.util.AppContainerImpl
 
 class BacklogApplication : Application() {
 
@@ -12,5 +14,5 @@ class BacklogApplication : Application() {
             .fallbackToDestructiveMigration()
             .build()
     }
-    val appContainer: AppContainer by lazy { AppContainer(database) }
+    val appContainer: AppContainerImpl by lazy { AppContainerImpl(database, WorkManager.getInstance(this)) }
 }

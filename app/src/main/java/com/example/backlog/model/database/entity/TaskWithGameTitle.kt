@@ -1,4 +1,4 @@
-package com.example.backlog.database.entity
+package com.example.backlog.model.database.entity
 
 import androidx.room.Embedded
 
