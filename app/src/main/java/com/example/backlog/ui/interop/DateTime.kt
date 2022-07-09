@@ -1,23 +1,24 @@
 package com.example.backlog.ui.interop
 
+import android.view.ContextThemeWrapper
+import android.widget.CalendarView
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.backlog.R
+import java.util.*
 
 @Composable
 private fun CustomDateTimeDialog(onDismissRequest: () -> Unit, content: @Composable () -> Unit) {
@@ -32,7 +33,7 @@ private fun CustomDateTimeDialog(onDismissRequest: () -> Unit, content: @Composa
 }
 
 @Composable
-fun DatePickerCompose(listener: DatePicker.OnDateChangedListener) {
+fun Calendar(listener: DatePicker.OnDateChangedListener) {
     AndroidView(
         factory = { DatePicker(it) },
         update = { view -> view.setOnDateChangedListener(listener) }
@@ -40,27 +41,30 @@ fun DatePickerCompose(listener: DatePicker.OnDateChangedListener) {
 }
 
 @Composable
-fun DatePickerDialogCompose(onDismissRequest: () -> Unit, onConfirmClick: (Int, Int, Int) -> Unit) {
+fun CalendarDialog(onDismissRequest: () -> Unit, onConfirmClick: (Int, Int, Int) -> Unit) {
     val year: MutableState<Int?> = remember { mutableStateOf(null) }
     val month: MutableState<Int?> = remember { mutableStateOf(null) }
     val dayOfMonth: MutableState<Int?> = remember { mutableStateOf(null) }
 
     CustomDateTimeDialog(onDismissRequest = onDismissRequest) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.padding(8.dp)
-        ) {
-            DatePickerCompose(listener = { _, y, m, d ->
-                year.value = y
-                month.value = m + 1 // Java...
-                dayOfMonth.value = d
-            })
-            Button(
-                onClick = { onConfirmClick(year.value!!, month.value!!, dayOfMonth.value!!) },
-                enabled = year.value != null && month.value != null && dayOfMonth.value != null
+        // TODO Proper theming
+        Surface() {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.padding(8.dp)
             ) {
-                Text(stringResource(R.string.button_confirm).uppercase())
+                Calendar(listener = { _, y, m, d ->
+                    year.value = y
+                    month.value = m + 1
+                    dayOfMonth.value = d
+                })
+                Button(
+                    enabled = year.value != null && month.value != null && dayOfMonth.value != null,
+                    onClick = { onConfirmClick(year.value!!, month.value!!, dayOfMonth.value!!) }
+                ) {
+                    Text(stringResource(R.string.button_confirm).uppercase())
+                }
             }
         }
     }

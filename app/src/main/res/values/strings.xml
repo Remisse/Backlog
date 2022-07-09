@@ -44,4 +44,16 @@
     <string name="task_insert_cancel_return">Return</string>
 
     <string name="button_confirm">Confirm</string>
+    <string name="game_insert_retail_price">Retail price</string>
+    <string name="card_edit_item">Edit</string>
+    <string name="card_delete_item">Delete</string>
+    <string name="game_delete_dialog_body">Are you sure you want to delete this game from your backlog?</string>
+    <string name="delete_failure_toast">Failed to delete</string>
+    <string name="form_field_mandatory">This field is mandatory</string>
+    <string name="task_update_success">Task updated</string>
+    <string name="task_update_failure">Failed to update task</string>
+    <string name="task_update_heading">Edit task</string>
+    <string name="edit_button">Edit</string>
+    <string name="dialog_warning_heading">Warning</string>
+    <string name="task_delete_body">Are you sure you want to delete this task?</string>
 </resources>

@@ -13,4 +13,5 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int, val icon:
     object GameCreation : Screen("game_creation", R.string.insert_topbar, Icons.Default.Add)
 
     object TaskCreation : Screen("task_creation", R.string.task_fab_add, Icons.Default.Add)
+    object TaskEdit : Screen("task_edit", R.string.task_update_heading, Icons.Default.EditNote)
 }
