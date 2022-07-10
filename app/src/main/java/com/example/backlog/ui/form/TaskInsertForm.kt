@@ -1,5 +1,6 @@
 package com.example.backlog.ui.form
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
@@ -26,11 +27,17 @@ import com.example.backlog.ui.interop.CalendarDialog
 import com.example.backlog.viewmodel.GameViewModel
 import com.example.backlog.viewmodel.TaskViewModel
 import com.example.backlog.ui.state.TaskFormState
+import java.text.DateFormat
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.*
 
 @Composable
 private fun GameSelectionDialogWithSearch(onDismissRequest: () -> Unit, onGameSelect: (Game) -> Unit,
-                                          gameViewModel: GameViewModel) {
+                                          gameViewModel: GameViewModel, enabled: Boolean) {
+    if (!enabled) return
+
     val searchText = remember { mutableStateOf("") }
     val gamesFlow = gameViewModel.backlog
     val games = gamesFlow.collectAsState(initial = listOf()).value
@@ -83,10 +90,13 @@ private fun GameSelectionDialogWithSearch(onDismissRequest: () -> Unit, onGameSe
     }
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun TaskFormContent(onSubmitClick: (TaskFormState) -> Unit, onCancelDialogSubmit: () -> Unit,
                     state: TaskFormState, @StringRes topBarTitle: Int, @StringRes submitButton: Int,
                     gameViewModel: GameViewModel) {
+    val format = LookAndFeel.dateFormat(Locale.getDefault())
+
     val gameSelectionInteractionSource = remember { MutableInteractionSource() }
     if (gameSelectionInteractionSource.collectIsPressedAsState().value) {
         state.showGameSelection = true
@@ -97,52 +107,51 @@ fun TaskFormContent(onSubmitClick: (TaskFormState) -> Unit, onCancelDialogSubmit
         state.showDatePicker = true
     }
 
-    if (state.showCancelDialog) {
-        CancelDialog(onDismissRequest = { state.showCancelDialog = false }) {
-            CancelDialogContent(
-                heading = R.string.task_insert_cancel_heading,
-                description = R.string.task_insert_cancel_description,
-                stayRes = R.string.insert_cancel_dialog_stay,
-                returnRes = R.string.task_insert_cancel_return,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                onStayButtonClick = { state.showCancelDialog = false },
-                onSubmitButtonClick = {
-                    state.showCancelDialog = false
-                    onCancelDialogSubmit()
-                }
-            )
-        }
-    }
-    if (state.showDatePicker) {
-        CalendarDialog(
-            onDismissRequest = { state.showDatePicker = false },
-            onConfirmClick = { year, month, dayOfMonth ->
-                state.deadline.value = LocalDate.of(year, month, dayOfMonth)
-                state.showDatePicker = false
-            })
-    }
-    if (state.showGameSelection) {
-        GameSelectionDialogWithSearch(
-            onDismissRequest = { state.showGameSelection = false},
-            onGameSelect = {
-                state.gameAndPlatform = "${it.title} (${it.platform})"
-                state.gameId.value = it.uid
-                state.showGameSelection = false
-            },
-            gameViewModel = gameViewModel
+    CancelDialog(
+        enabled = state.showCancelDialog,
+        onDismissRequest = { state.showCancelDialog = false }
+    ) {
+        CancelDialogContent(
+            heading = R.string.task_insert_cancel_heading,
+            description = R.string.task_insert_cancel_description,
+            stayRes = R.string.insert_cancel_dialog_stay,
+            returnRes = R.string.task_insert_cancel_return,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            onStayButtonClick = { state.showCancelDialog = false },
+            onSubmitButtonClick = {
+                state.showCancelDialog = false
+                onCancelDialogSubmit()
+            }
         )
     }
+    CalendarDialog(
+        enabled = state.showDatePicker,
+        onDismissRequest = { state.showDatePicker = false },
+        onConfirmClick = { year, month, dayOfMonth ->
+            state.deadline.value = LocalDate.of(year, month, dayOfMonth)
+            state.showDatePicker = false
+        }
+    )
+    GameSelectionDialogWithSearch(
+        enabled = state.showGameSelection,
+        onDismissRequest = { state.showGameSelection = false},
+        onGameSelect = {
+            state.gameAndPlatform = "${it.title} (${it.platform})"
+            state.gameId.value = it.uid
+            state.showGameSelection = false
+        },
+        gameViewModel = gameViewModel
+    )
     Scaffold(
         topBar = {
             SubScreenTopBar(heading = topBarTitle) { state.showCancelDialog = true }
         }
-    ) { padding ->
+    ) {
         Column(
-            modifier = Modifier.padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = LookAndFeel.FieldColumnModifier,
+            verticalArrangement = LookAndFeel.FieldColumnVerticalArrangement
         ) {
-            OutlinedTextField(
+            TextField(
                 value = state.gameAndPlatform,
                 onValueChange = {},
                 label = { Text(stringResource(R.string.task_field_game)) },
@@ -151,7 +160,7 @@ fun TaskFormContent(onSubmitClick: (TaskFormState) -> Unit, onCancelDialogSubmit
                 interactionSource = gameSelectionInteractionSource,
                 readOnly = true
             )
-            OutlinedTextField(
+            TextField(
                 value = state.description.value,
                 onValueChange = { state.description.value = it },
                 label = { Text(stringResource(R.string.task_field_description)) },
@@ -159,8 +168,8 @@ fun TaskFormContent(onSubmitClick: (TaskFormState) -> Unit, onCancelDialogSubmit
                 shape = LookAndFeel.FieldShape,
                 isError = state.description.hasErrors()
             )
-            OutlinedTextField(
-                value = state.deadline.value.toString(),
+            TextField(
+                value = if (state.deadline.value != null) format.format(state.deadline.value) else "",
                 onValueChange = {},
                 label = { Text(stringResource(R.string.task_field_deadline_date)) },
                 readOnly = true,
