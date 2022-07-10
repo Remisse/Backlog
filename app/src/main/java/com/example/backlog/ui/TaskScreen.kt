@@ -10,10 +10,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
-import com.example.backlog.model.database.TaskStatus
 import com.example.backlog.model.database.entity.TaskWithGameTitle
 import com.example.backlog.viewmodel.TaskViewModel
 import java.time.LocalDate
@@ -61,7 +58,7 @@ private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier, onEditCl
                         )
                         Text(
                             text = item.gameTitle,
-                            color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f)
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
                         )
                     }
                     Row(
@@ -75,7 +72,7 @@ private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier, onEditCl
                         )
                         Text(
                             text = LocalDate.ofEpochDay(item.task.deadlineDateEpochDay as Long).toString(),
-                            color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f)
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
                         )
                     }
                 },

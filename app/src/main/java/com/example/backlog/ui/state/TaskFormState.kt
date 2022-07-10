@@ -3,7 +3,7 @@ package com.example.backlog.ui.state
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.backlog.model.database.TaskStatus
+import com.example.backlog.model.TaskStatus
 import com.example.backlog.model.database.entity.Task
 import com.example.backlog.viewmodel.validator.RequiredValidator
 import java.lang.IllegalStateException

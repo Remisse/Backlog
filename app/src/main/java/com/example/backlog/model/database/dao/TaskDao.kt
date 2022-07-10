@@ -1,7 +1,7 @@
 package com.example.backlog.model.database.dao
 
 import androidx.room.*
-import com.example.backlog.model.database.TaskStatus
+import com.example.backlog.model.TaskStatus
 import com.example.backlog.model.database.entity.Task
 import com.example.backlog.model.database.entity.TaskWithGameTitle
 import kotlinx.coroutines.flow.Flow

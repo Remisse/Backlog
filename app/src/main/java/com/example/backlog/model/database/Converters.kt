@@ -1,6 +1,8 @@
 package com.example.backlog.model.database
 
 import androidx.room.TypeConverter
+import com.example.backlog.model.GameStatus
+import com.example.backlog.model.TaskStatus
 
 class Converters {
 

@@ -2,8 +2,8 @@ package com.example.backlog.ui
 
 import androidx.compose.ui.graphics.Color
 import com.example.backlog.R
-import com.example.backlog.model.database.GameStatus
-import com.example.backlog.model.database.TaskStatus
+import com.example.backlog.model.GameStatus
+import com.example.backlog.model.TaskStatus
 import com.example.backlog.ui.theme.*
 
 fun taskStatusToResource(status: TaskStatus): Int {

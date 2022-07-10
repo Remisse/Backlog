@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
-import com.example.backlog.model.database.TaskStatus
+import com.example.backlog.model.TaskStatus
 
 @Entity(foreignKeys = [ForeignKey(entity = Game::class,
     parentColumns = ["uid"],

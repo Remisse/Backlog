@@ -3,7 +3,7 @@ package com.example.backlog.viewmodel
 import androidx.lifecycle.*
 import androidx.work.*
 import com.example.backlog.model.DeadlineWorker
-import com.example.backlog.model.database.TaskStatus
+import com.example.backlog.model.TaskStatus
 import com.example.backlog.model.database.dao.TaskDao
 import com.example.backlog.model.database.entity.Task
 import com.example.backlog.model.database.entity.TaskWithGameTitle
