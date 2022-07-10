@@ -1,6 +1,8 @@
 package com.example.backlog.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -54,11 +56,11 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController, appConta
             enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
             exitTransition = { fadeOut() }
         ) { BacklogScreen(
-            onCreateButtonClick = { navController.navigate(Screen.GameCreation.route) },
-            onOnlineSearchButtonClick = { /* TODO */ },
-            onEditCardClick = { /* TODO */ },
-            fabModifier = fabModifier,
-            gameViewModel = viewModel(factory = appContainer.gameViewModelFactory),
+                onCreateButtonClick = { navController.navigate(Screen.GameCreation.route) },
+                onOnlineSearchButtonClick = { /* TODO */ },
+                onEditCardClick = { /* TODO */ },
+                fabModifier = fabModifier,
+                gameViewModel = viewModel(factory = appContainer.gameViewModelFactory),
         ) }
         composable(
             route = Screen.Tasks.route,
@@ -78,7 +80,8 @@ private fun NavGraphBuilder.mainGraph(navController: NavHostController, appConta
             exitTransition = { fadeOut() }
         ) {
             ProfileScreen(
-                gameViewModel = viewModel(factory = appContainer.gameViewModelFactory)
+                gameViewModel = viewModel(factory = appContainer.gameViewModelFactory),
+                taskViewModel = viewModel(factory = appContainer.taskViewModelFactory)
             )
         }
     }

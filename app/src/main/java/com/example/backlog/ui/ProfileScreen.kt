@@ -3,24 +3,24 @@ package com.example.backlog.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.backlog.model.database.GameStatus
+import com.example.backlog.R
+import com.example.backlog.model.GameStatus
 import com.example.backlog.viewmodel.GameViewModel
+import com.example.backlog.viewmodel.TaskViewModel
 import com.github.tehras.charts.piechart.PieChart
 import com.github.tehras.charts.piechart.PieChartData
 import com.github.tehras.charts.piechart.PieChartData.Slice
@@ -37,18 +37,12 @@ private fun OutlinedSurface(modifier: Modifier = Modifier, content: @Composable 
 }
 
 @Composable
-private fun ChartBox(counts: List<Pair<Float, GameStatus>>) {
-    OutlinedSurface() {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            PieChart(
-                pieChartData = PieChartData(counts.map { pair ->
-                    Slice(value = pair.first, color = gameStatusToColor(pair.second))
-                } ),
-                modifier = Modifier
-                    .size(150.dp)
-                    .padding(12.dp)
-            )
-            Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+private fun GameStatusPie(counts: Map<GameStatus, Int>) {
+    OutlinedSurface(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -64,28 +58,47 @@ private fun ChartBox(counts: List<Pair<Float, GameStatus>>) {
                                 .clip(RoundedCornerShape(2.dp))
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                        Text(text = stringResource(gameStatusToResource(status)))
+                        Text(text = "${stringResource(gameStatusToResource(status))} (${counts[status]})")
                     }
                 }
             }
+            Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+            PieChart(
+                pieChartData = PieChartData(counts.map { entry ->
+                    Slice(value = entry.value.toFloat(), color = gameStatusToColor(entry.key))
+                } ),
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(12.dp)
+            )
         }
     }
 }
 
 @Composable
-fun ProfileScreen(gameViewModel: GameViewModel) {
-    val gamesFlow = gameViewModel.backlog
+fun ProfileScreen(gameViewModel: GameViewModel, taskViewModel: TaskViewModel) {
+    val backlog = gameViewModel.backlog
+        .collectAsState(initial = emptyList())
+        .value
 
-    val counts: List<Pair<Float, GameStatus>> = GameStatus.values().map { status ->
-        gamesFlow.collectAsState(initial = listOf()).value
-            .filter { g -> g.status == status }
-            .size
-            .toFloat() to status
-    }
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = LookAndFeel.FieldColumnModifier,
+        horizontalAlignment = LookAndFeel.FieldColumnHorizontalAlignment,
+        verticalArrangement = LookAndFeel.FieldColumnVerticalArrangement
     ) {
-        ChartBox(counts = counts)
+        if (backlog.isEmpty()) {
+            Text(
+                text = stringResource(R.string.profile_no_data),
+                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                textAlign = TextAlign.Center
+            )
+        } else {
+            val counts: Map<GameStatus, Int> = GameStatus.values().associateBy(
+                keySelector = { status -> status },
+                valueTransform = { status -> backlog.filter { it.status == status }.size }
+            )
+            Text(text = stringResource(R.string.profile_stats_heading), style = MaterialTheme.typography.subtitle1)
+            GameStatusPie(counts = counts)
+        }
     }
 }
