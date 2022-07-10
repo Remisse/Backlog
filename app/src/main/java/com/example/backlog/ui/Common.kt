@@ -210,13 +210,15 @@ fun ActionsFab(@StringRes textRes: Int, icon: ImageVector, modifier: Modifier,
 }
 
 @Composable
-fun CancelDialog(onDismissRequest: () -> Unit, dialogContent: @Composable () -> Unit) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
-    ) {
-        Surface(shape = LookAndFeel.DialogSurfaceShape) {
-            dialogContent()
+fun CancelDialog(enabled: Boolean, onDismissRequest: () -> Unit, dialogContent: @Composable () -> Unit) {
+    if (enabled) {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+        ) {
+            Surface(shape = LookAndFeel.DialogSurfaceShape) {
+                dialogContent()
+            }
         }
     }
 }

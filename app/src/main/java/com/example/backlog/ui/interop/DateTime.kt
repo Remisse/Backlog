@@ -41,29 +41,31 @@ fun Calendar(listener: DatePicker.OnDateChangedListener) {
 }
 
 @Composable
-fun CalendarDialog(onDismissRequest: () -> Unit, onConfirmClick: (Int, Int, Int) -> Unit) {
-    val year: MutableState<Int?> = remember { mutableStateOf(null) }
-    val month: MutableState<Int?> = remember { mutableStateOf(null) }
-    val dayOfMonth: MutableState<Int?> = remember { mutableStateOf(null) }
+fun CalendarDialog(enabled: Boolean, onDismissRequest: () -> Unit, onConfirmClick: (Int, Int, Int) -> Unit) {
+    if (enabled) {
+        val year: MutableState<Int?> = remember { mutableStateOf(null) }
+        val month: MutableState<Int?> = remember { mutableStateOf(null) }
+        val dayOfMonth: MutableState<Int?> = remember { mutableStateOf(null) }
 
-    CustomDateTimeDialog(onDismissRequest = onDismissRequest) {
-        // TODO Proper theming
-        Surface() {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Calendar(listener = { _, y, m, d ->
-                    year.value = y
-                    month.value = m + 1
-                    dayOfMonth.value = d
-                })
-                Button(
-                    enabled = year.value != null && month.value != null && dayOfMonth.value != null,
-                    onClick = { onConfirmClick(year.value!!, month.value!!, dayOfMonth.value!!) }
+        CustomDateTimeDialog(onDismissRequest = onDismissRequest) {
+            // TODO Proper theming
+            Surface() {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.padding(8.dp)
                 ) {
-                    Text(stringResource(R.string.button_confirm).uppercase())
+                    Calendar(listener = { _, y, m, d ->
+                        year.value = y
+                        month.value = m + 1
+                        dayOfMonth.value = d
+                    })
+                    Button(
+                        enabled = year.value != null && month.value != null && dayOfMonth.value != null,
+                        onClick = { onConfirmClick(year.value!!, month.value!!, dayOfMonth.value!!) }
+                    ) {
+                        Text(stringResource(R.string.button_confirm).uppercase())
+                    }
                 }
             }
         }
