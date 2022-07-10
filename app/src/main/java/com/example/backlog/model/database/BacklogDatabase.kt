@@ -10,7 +10,7 @@ import com.example.backlog.model.database.entity.Task
 
 @Database(
     entities = [Game::class, Task::class],
-    version = 9
+    version = 11
 )
 @TypeConverters(Converters::class)
 abstract class BacklogDatabase() : RoomDatabase() {

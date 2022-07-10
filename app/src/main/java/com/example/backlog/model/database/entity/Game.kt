@@ -3,7 +3,8 @@ package com.example.backlog.model.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.backlog.model.database.GameStatus
+import com.example.backlog.model.GameStatus
+import java.time.LocalDate
 
 @Entity
 data class Game(
@@ -11,6 +12,9 @@ data class Game(
     val title: String,
     val platform: String,
     val status: GameStatus,
-    @ColumnInfo(name = "retail_price") val retailPrice: Long,
+    val developer: String?,
+    val publisher: String?,
+    val genre: String?,
+    @ColumnInfo(name = "release_date") val releaseDate: Long?,
     @ColumnInfo(name = "cover_path") val coverPath: String?
 )
