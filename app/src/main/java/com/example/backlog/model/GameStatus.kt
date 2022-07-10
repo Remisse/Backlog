@@ -1,4 +1,4 @@
-package com.example.backlog.model.database
+package com.example.backlog.model
 
 enum class GameStatus {
 
