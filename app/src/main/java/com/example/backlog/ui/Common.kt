@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -66,9 +65,8 @@ fun CardSubtitleTextIcon(text: String, imageVector: ImageVector) {
 }
 
 @Composable
-fun ItemCard(modifier: Modifier, topText: @Composable () -> Unit, subText: @Composable () -> Unit,
-             hiddenText: (@Composable () -> Unit)?, onChangeStatusClick: () -> Unit,
-             onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+fun ItemCard(modifier: Modifier, exposedText: @Composable () -> Unit, hiddenText: (@Composable () -> Unit)?,
+             onChangeStatusClick: () -> Unit, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
     var isExpanded by remember { mutableStateOf(false) }
     var showActionMenu by remember { mutableStateOf(false) }
 
@@ -88,7 +86,7 @@ fun ItemCard(modifier: Modifier, topText: @Composable () -> Unit, subText: @Comp
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    topText()
+                    exposedText()
                     Row(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
@@ -139,7 +137,6 @@ fun ItemCard(modifier: Modifier, topText: @Composable () -> Unit, subText: @Comp
                 }
                 Row(horizontalArrangement = Arrangement.Start) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)) {
-                        subText()
                         if (isExpanded) {
                             hiddenText?.invoke()
                         }

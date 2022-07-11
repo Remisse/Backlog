@@ -15,8 +15,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.backlog.R
 import com.example.backlog.model.GameStatus
 import com.example.backlog.model.database.entity.Game
@@ -33,21 +31,21 @@ private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDelete
         items(games) { game ->
             ItemCard(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                topText = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                exposedText = {
+                    Column(
+                        horizontalAlignment = Alignment.Start
+                    ) {
                         Text(
                             text = stringResource(gameStatusToResource(game.status)).uppercase(),
                             color = gameStatusToColor(game.status),
                             style = MaterialTheme.typography.caption
                         )
-                        Spacer(modifier = Modifier.padding(horizontal = 2.dp))
                         Text(
                             text = game.title,
-                            style = MaterialTheme.typography.subtitle1
+                            style = MaterialTheme.typography.subtitle2
                         )
                     }
                 },
-                subText = { },
                 hiddenText = {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         CardSubtitleTextIcon(text = game.platform, imageVector = Icons.Outlined.VideogameAsset)

@@ -196,7 +196,7 @@ fun GameInsertScreen(onDialogSubmitClick: () -> Unit, onEntryAddSuccess: () -> U
         stringResource(R.string.insert_game_failure_toast), Toast.LENGTH_SHORT)
 
     GameFormContent(
-        state = remember { gameViewModel.formState },
+        state = remember { GameFormState() },
         button = R.string.insert_button_add,
         onCancelDialogConfirm = onDialogSubmitClick,
         onCommitButtonClick = { state ->

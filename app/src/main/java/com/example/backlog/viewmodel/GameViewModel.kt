@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 
 class GameViewModel(private val dao: GameDao) : ViewModel(), BacklogViewModel<Game> {
 
-    val formState = GameFormState()
-
     val backlog: Flow<List<Game>> = dao.backlog()
 
     override fun entityById(uid: Int): Flow<Game> {
