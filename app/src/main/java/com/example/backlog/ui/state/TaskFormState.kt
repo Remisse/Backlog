@@ -5,17 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.backlog.model.TaskStatus
 import com.example.backlog.model.database.entity.Task
-import com.example.backlog.viewmodel.validator.RequiredValidator
+import com.example.backlog.viewmodel.validator.Required
 import java.lang.IllegalStateException
 import java.time.LocalDate
+import kotlin.reflect.full.declaredMemberProperties
 
-class TaskFormState : FormState<Task> {
-
-    var uid: Int = 0
-        private set
-    val description: FormElement<String> = FormElement("", listOf(RequiredValidator()))
-    val gameId: FormElement<Int?> = FormElement(null, listOf(RequiredValidator()))
-    val deadline: FormElement<LocalDate?> = FormElement(null, listOf(RequiredValidator()))
+data class TaskFormState(
+    var uid: Int = 0,
+    val description: FormElement<String> = FormElement("", listOf(Required())),
+    val gameId: FormElement<Int?> = FormElement(null, listOf(Required())),
+    val deadline: FormElement<LocalDate?> = FormElement(null, listOf(Required()))
+) : FormState<Task> {
 
     var gameAndPlatform by mutableStateOf("")
 
@@ -38,16 +38,12 @@ class TaskFormState : FormState<Task> {
         uid = entity.uid
         description.value = entity.description
         gameId.value = entity.gameId
-        deadline.value = if (entity.deadlineDateEpochDay == null) {
-            null
-        } else {
-            LocalDate.ofEpochDay(entity.deadlineDateEpochDay)
-        }
+        deadline.value = entity.deadlineDateEpochDay?.let { LocalDate.ofEpochDay(it) }
     }
 
     override fun validateAll(): Boolean {
-        return !(description.validate().isNotEmpty()
-                || gameId.validate().isNotEmpty()
-                || deadline.validate().isNotEmpty())
+        return this::class.declaredMemberProperties.map { it.getter.call(this) }
+            .filterIsInstance<FormElement<*>>()
+            .all { it.validate().isEmpty() }
     }
 }

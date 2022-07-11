@@ -7,6 +7,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
+import com.example.backlog.ui.state.FormState
+import com.example.backlog.ui.state.TaskFormState
+import com.example.backlog.viewmodel.BacklogViewModel
 import com.example.backlog.viewmodel.GameViewModel
 import com.example.backlog.viewmodel.TaskViewModel
 import kotlinx.coroutines.launch
@@ -15,8 +18,7 @@ import kotlinx.coroutines.launch
 fun TaskEditScreen(taskId: Int, onEditSuccess: () -> Unit, onCancelDialogSubmitClick: () -> Unit,
                    gameViewModel: GameViewModel = viewModel(),
                    taskViewModel: TaskViewModel = viewModel()) {
-    val task = taskViewModel.taskById(taskId)
-    val state = taskViewModel.formState
+    val state = remember { TaskFormState() }
     val isTaskImported = rememberSaveable { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
@@ -24,10 +26,10 @@ fun TaskEditScreen(taskId: Int, onEditSuccess: () -> Unit, onCancelDialogSubmitC
     if (!isTaskImported.value) {
         LaunchedEffect(Unit) {
             scope.launch {
-                task.collect {
+                taskViewModel.entityById(taskId).collect {
                     state.fromEntity(it)
 
-                    gameViewModel.gameById(it.gameId).collect { game ->
+                    gameViewModel.entityById(it.gameId).collect { game ->
                         state.gameAndPlatform = "${game.title} (${game.platform})"
                     }
 
@@ -46,7 +48,7 @@ fun TaskEditScreen(taskId: Int, onEditSuccess: () -> Unit, onCancelDialogSubmitC
         onSubmitClick = {
             if (it.validateAll()) {
                 taskViewModel.update(
-                    task = it.toEntity(),
+                    entity = it.toEntity(),
                     onSuccess = {
                         successToast.show()
                         onEditSuccess()

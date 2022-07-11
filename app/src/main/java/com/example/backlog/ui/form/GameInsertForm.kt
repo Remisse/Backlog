@@ -2,10 +2,10 @@ package com.example.backlog.ui.form
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.magnifier
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -20,6 +20,7 @@ import com.example.backlog.R
 import com.example.backlog.model.GameStatus
 import com.example.backlog.ui.*
 import com.example.backlog.ui.interop.CalendarDialog
+import com.example.backlog.ui.state.GameFormState
 import com.example.backlog.viewmodel.GameViewModel
 import java.time.LocalDate
 import java.util.*
@@ -75,21 +76,14 @@ private fun StatusMenu(value: GameStatus, onSelect: (GameStatus) -> Unit) {
 // TODO Error dialog with all validators' error messages when clicking the Create button
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun GameInsertScreen(onDialogSubmitClick: () -> Unit, onEntryAddSuccess: () -> Unit,
-                     gameViewModel: GameViewModel = viewModel()) {
-    val state = remember { gameViewModel.formState }
-
+fun GameFormContent(state: GameFormState, onCancelDialogConfirm: () -> Unit,
+                    onCommitButtonClick: (GameFormState) -> Unit, @StringRes button: Int) {
     val format = LookAndFeel.dateFormat(Locale.getDefault())
 
     val dateInteractionSource = remember { MutableInteractionSource() }
     if (dateInteractionSource.collectIsPressedAsState().value) {
         state.showCalendar = true
     }
-
-    val successToast = Toast.makeText(LocalContext.current,
-        stringResource(R.string.insert_game_success_toast), Toast.LENGTH_SHORT)
-    val failureToast = Toast.makeText(LocalContext.current,
-        stringResource(R.string.insert_game_success_toast), Toast.LENGTH_SHORT)
 
     CancelDialog(
         enabled = state.showCancelDialog,
@@ -98,7 +92,7 @@ fun GameInsertScreen(onDialogSubmitClick: () -> Unit, onEntryAddSuccess: () -> U
         CancelDialogContent(
             onSubmitButtonClick = {
                 state.showCancelDialog = false
-                onDialogSubmitClick()
+                onCancelDialogConfirm()
             },
             onStayButtonClick = { state.showCancelDialog = false },
             heading = R.string.insert_cancel_dialog_heading,
@@ -182,25 +176,42 @@ fun GameInsertScreen(onDialogSubmitClick: () -> Unit, onEntryAddSuccess: () -> U
                     state.status.value = it
                 })
             Button(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
-                onClick = {
-                    if (state.validateAll()) {
-                        gameViewModel.insert(
-                            game = state.toEntity(),
-                            onSuccess = {
-                                successToast.show()
-                                onEntryAddSuccess()
-                            },
-                            onFailure = {
-                                failureToast.show()
-                            }
-                        )
-                    }
-                }
+                onClick = { onCommitButtonClick(state) }
             ) {
-                Text(stringResource(R.string.insert_button_add).uppercase())
+                Text(stringResource(button).uppercase())
             }
         }
     }
+}
+
+@Composable
+fun GameInsertScreen(onDialogSubmitClick: () -> Unit, onEntryAddSuccess: () -> Unit,
+                     gameViewModel: GameViewModel = viewModel()) {
+    val successToast = Toast.makeText(LocalContext.current,
+        stringResource(R.string.insert_game_success_toast), Toast.LENGTH_SHORT)
+    val failureToast = Toast.makeText(LocalContext.current,
+        stringResource(R.string.insert_game_failure_toast), Toast.LENGTH_SHORT)
+
+    GameFormContent(
+        state = remember { gameViewModel.formState },
+        button = R.string.insert_button_add,
+        onCancelDialogConfirm = onDialogSubmitClick,
+        onCommitButtonClick = { state ->
+            if (state.validateAll()) {
+                gameViewModel.insert(
+                    entity = state.toEntity(),
+                    onSuccess = {
+                        successToast.show()
+                        onEntryAddSuccess()
+                    },
+                    onFailure = {
+                        failureToast.show()
+                    }
+                )
+            }
+        }
+    )
 }

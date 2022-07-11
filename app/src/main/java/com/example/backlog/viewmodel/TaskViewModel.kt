@@ -14,9 +14,8 @@ import java.util.concurrent.TimeUnit
 
 private const val WORK_TAG = "deadline"
 
-class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManager) : ViewModel() {
-
-    val formState = TaskFormState()
+class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManager) : ViewModel(),
+    BacklogViewModel<Task> {
 
     private val tasks: Flow<List<Task>> = dao.allTasks()
 
@@ -27,10 +26,10 @@ class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManag
         .map { list -> list.map { k -> Integer.parseInt(k) } }
         .asFlow()
 
-    fun taskById(taskId: Int): Flow<Task> = dao.taskById(taskId)
+    override fun entityById(uid: Int): Flow<Task> = dao.taskById(uid)
 
-    fun insert(task: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
-        if (dao.insert(task) != 0L) {
+    override fun insert(entity: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+        if (dao.insert(entity) != 0L) {
             recreateDeadlineWorkRequest()
             onSuccess()
         } else {
@@ -38,8 +37,8 @@ class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManag
         }
     }
 
-    fun delete(taskId: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
-        if (dao.delete(taskId) != 0) {
+    override fun delete(uid: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+        if (dao.delete(uid) != 0) {
             recreateDeadlineWorkRequest()
             onSuccess()
         } else {
@@ -47,13 +46,13 @@ class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManag
         }
     }
 
-    fun setTaskStatus(taskId: Int, status: TaskStatus) = viewModelScope.launch {
+    fun setStatus(taskId: Int, status: TaskStatus) = viewModelScope.launch {
         dao.setTaskStatus(taskId, status)
         recreateDeadlineWorkRequest()
     }
 
-    fun update(task: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
-        if (dao.update(task) != 0) {
+    override fun update(entity: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+        if (dao.update(entity) != 0) {
             recreateDeadlineWorkRequest()
             onSuccess()
         } else {

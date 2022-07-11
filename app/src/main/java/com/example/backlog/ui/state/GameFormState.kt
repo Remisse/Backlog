@@ -5,21 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.backlog.model.GameStatus
 import com.example.backlog.model.database.entity.Game
-import com.example.backlog.viewmodel.validator.RequiredValidator
+import com.example.backlog.viewmodel.validator.Required
 import java.time.LocalDate
+import kotlin.reflect.full.declaredMemberProperties
 
-class GameFormState: FormState<Game> {
-
-    var uid: Int = 0
-        private set
-    val title: FormElement<String> = FormElement("", listOf(RequiredValidator()))
-    val platform: FormElement<String> = FormElement("", listOf(RequiredValidator()))
-    val genre: FormElement<String> = FormElement("")
-    val releaseDate: FormElement<LocalDate?> = FormElement(null)
-    val developer: FormElement<String> = FormElement("")
-    val publisher: FormElement<String> = FormElement("")
-    val status: FormElement<GameStatus> = FormElement(GameStatus.NOT_STARTED, listOf(RequiredValidator()))
-    /* TODO Cover */
+data class GameFormState(
+    var uid: Int = 0,
+    val title: FormElement<String> = FormElement("", listOf(Required())),
+    val platform: FormElement<String> = FormElement("", listOf(Required())),
+    val genre: FormElement<String> = FormElement(""),
+    val releaseDate: FormElement<LocalDate?> = FormElement(null),
+    val developer: FormElement<String> = FormElement(""),
+    val publisher: FormElement<String> = FormElement(""),
+    val status: FormElement<GameStatus> = FormElement(GameStatus.NOT_STARTED, listOf(Required()))
+) : FormState<Game> {
 
     var showCalendar by mutableStateOf(false)
     var showCancelDialog by mutableStateOf(false)
@@ -43,16 +42,17 @@ class GameFormState: FormState<Game> {
         uid = entity.uid
         title.value = entity.title
         platform.value = entity.platform
+        genre.value = entity.genre.orEmpty()
+        releaseDate.value = entity.releaseDate?.let { LocalDate.ofEpochDay(it) }
+        developer.value = entity.developer.orEmpty()
+        publisher.value = entity.publisher.orEmpty()
         status.value = entity.status
     }
 
+    // TODO Extract abstract class
     override fun validateAll(): Boolean {
-        return !(title.validate().isNotEmpty()
-                || platform.validate().isNotEmpty()
-                || status.validate().isNotEmpty()
-                || genre.validate().isNotEmpty()
-                || releaseDate.validate().isNotEmpty()
-                || developer.validate().isNotEmpty()
-                || publisher.validate().isNotEmpty())
+        return this::class.declaredMemberProperties.map { it.getter.call(this) }
+            .filterIsInstance<FormElement<*>>()
+            .all { it.validate().isEmpty() }
     }
 }

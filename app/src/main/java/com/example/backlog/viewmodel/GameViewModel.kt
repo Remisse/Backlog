@@ -1,40 +1,54 @@
 package com.example.backlog.viewmodel
 
 import androidx.lifecycle.*
+import com.example.backlog.model.GameStatus
+import com.example.backlog.model.TaskStatus
 import com.example.backlog.model.database.dao.GameDao
 import com.example.backlog.model.database.entity.Game
 import com.example.backlog.ui.state.GameFormState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
-class GameViewModel(private val dao: GameDao) : ViewModel() {
+class GameViewModel(private val dao: GameDao) : ViewModel(), BacklogViewModel<Game> {
 
     val formState = GameFormState()
 
     val backlog: Flow<List<Game>> = dao.backlog()
 
-    fun gameById(uid: Int): Flow<Game> {
+    override fun entityById(uid: Int): Flow<Game> {
         return dao.gameById(uid)
     }
 
     /**
      * Launching a new coroutine to insert the data in a non-blocking way
      */
-    fun insert(game: Game, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
-        if (dao.insert(game) != 0L) {
+    override fun insert(entity: Game, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+        if (dao.insert(entity) != 0L) {
             onSuccess()
         } else {
             onFailure()
         }
     }
 
-    fun delete(uid: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+    override fun delete(uid: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
         if (dao.delete(uid) != 0) {
             onSuccess()
         } else {
             onFailure()
         }
+    }
+
+    override fun update(entity: Game, onSuccess: () -> Unit, onFailure: () -> Unit): Job = viewModelScope.launch {
+        if (dao.update(entity) != 0) {
+            onSuccess()
+        } else {
+            onFailure()
+        }
+    }
+
+    fun setStatus(uid: Int, status: GameStatus) = viewModelScope.launch {
+        dao.setStatus(uid, status)
     }
 }
 

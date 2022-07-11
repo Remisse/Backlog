@@ -6,9 +6,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.VideogameAsset
+import androidx.compose.material.icons.outlined.AddTask
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,14 +19,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
+import com.example.backlog.model.TaskStatus
 import com.example.backlog.model.database.entity.TaskWithGameTitle
 import com.example.backlog.viewmodel.TaskViewModel
 import java.time.LocalDate
+import java.util.*
 
 @Composable
-private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier, onEditClick: (Int) -> Unit,
-                     onDeleteClick: (Int?) -> Unit) {
+private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier = Modifier, onEditClick: (Int) -> Unit,
+                     onDeleteClick: (Int?) -> Unit, onChangeStatusClick: (Int) -> Unit) {
     val iconModifier = Modifier.size(10.dp)
+    val format = LookAndFeel.dateFormat(Locale.getDefault())
 
     LazyColumn(
         modifier = modifier,
@@ -39,44 +42,22 @@ private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier, onEditCl
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = stringResource(taskStatusToResource(item.task.status)).uppercase(),
-                            fontSize = 10.sp,
+                            style = MaterialTheme.typography.caption,
                             color = taskStatusToColor(item.task.status)
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 6.dp))
-                        Text(text = item.task.description, fontWeight = FontWeight.SemiBold)
+                        Text(text = item.task.description, style = MaterialTheme.typography.subtitle2)
                     }
                 },
                 subText = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.VideogameAsset,
-                            contentDescription = null,
-                            modifier = iconModifier
-                        )
-                        Text(
-                            text = item.gameTitle,
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
-                        )
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarToday,
-                            contentDescription = null,
-                            modifier = iconModifier
-                        )
-                        Text(
-                            text = LocalDate.ofEpochDay(item.task.deadlineDateEpochDay as Long).toString(),
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)
-                        )
-                    }
+                    CardSubtitleTextIcon(text = item.gameTitle, imageVector = Icons.Default.VideogameAsset)
+                    item.task.deadlineDateEpochDay?.let { CardSubtitleTextIcon(
+                        text = format.format(LocalDate.ofEpochDay(it)),
+                        imageVector = Icons.Default.CalendarToday
+                    ) }
                 },
                 hiddenText = null,
+                onChangeStatusClick = { onChangeStatusClick(item.task.uid) } ,
                 onEditClick = { onEditClick(item.task.uid) },
                 onDeleteClick = { onDeleteClick(item.task.uid) }
             )
@@ -85,14 +66,25 @@ private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier, onEditCl
 }
 
 @Composable
-fun TaskScreen(onCreateClick: () -> Unit, fabModifier: Modifier, onTaskEditClick: (Int) -> Unit,
-               taskViewModel: TaskViewModel = viewModel()) {
+fun TaskFab(modifier: Modifier = Modifier, onCreateClick: () -> Unit) {
+    ExtendedFloatingActionButton(
+        text = { Text(stringResource(R.string.task_fab_add).uppercase()) },
+        icon = { Icon(imageVector = Icons.Outlined.AddTask, contentDescription = null) },
+        onClick = onCreateClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun TaskScreen(onTaskEditClick: (Int) -> Unit, taskViewModel: TaskViewModel = viewModel()) {
     val tasksFlow = taskViewModel.tasksWithGameTitle
 
-    val taskUidToDelete: MutableState<Int?> = remember { mutableStateOf(null) }
+    val taskUidChangeState: MutableState<Int?> = remember { mutableStateOf(null) }
+    val resetChangeState = { taskUidChangeState.value = null }
 
-    val failureToast = Toast.makeText(LocalContext.current, stringResource(R.string.delete_failure_toast), Toast.LENGTH_SHORT)
+    val taskUidToDelete: MutableState<Int?> = remember { mutableStateOf(null) }
     val resetDeleteState = { taskUidToDelete.value = null }
+    val failureToast = Toast.makeText(LocalContext.current, stringResource(R.string.delete_failure_toast), Toast.LENGTH_SHORT)
 
     if (taskUidToDelete.value != null) {
         DeleteDialog(
@@ -111,24 +103,26 @@ fun TaskScreen(onCreateClick: () -> Unit, fabModifier: Modifier, onTaskEditClick
             body = R.string.task_delete_body
         )
     }
-
-    Scaffold(
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(stringResource(R.string.task_fab_add).uppercase()) },
-                icon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-                onClick = onCreateClick,
-                modifier = fabModifier
+    if (taskUidChangeState.value != null) {
+        Surface(shape = LookAndFeel.DialogSurfaceShape, modifier = Modifier.padding(16.dp)) {
+            StatusMenu(
+                expanded = taskUidChangeState.value != null,
+                onSelect = { status: TaskStatus ->
+                    taskViewModel.setStatus(taskUidChangeState.value!!, status)
+                    resetChangeState()
+                },
+                onDismissRequest = resetChangeState,
+                toColor = { taskStatusToColor(it) },
+                toResource = { taskStatusToResource(it) }
             )
         }
-    ) {
-        tasksFlow.collectAsState(initial = listOf()).value.apply {
-            TaskList(
-                list = this,
-                modifier = Modifier.padding(it),
-                onEditClick = onTaskEditClick,
-                onDeleteClick = { uid -> taskUidToDelete.value = uid }
-            )
-        }
+    }
+    tasksFlow.collectAsState(initial = listOf()).value.apply {
+        TaskList(
+            list = this,
+            onChangeStatusClick = { taskUidChangeState.value = it },
+            onEditClick = onTaskEditClick,
+            onDeleteClick = { uid -> taskUidToDelete.value = uid }
+        )
     }
 }

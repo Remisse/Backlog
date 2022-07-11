@@ -1,6 +1,6 @@
 package com.example.backlog.viewmodel.validator
 
-class RequiredValidator<in T> : Validator<T> {
+class Required<in T> : Validator<T> {
 
     override val error = "required"
 

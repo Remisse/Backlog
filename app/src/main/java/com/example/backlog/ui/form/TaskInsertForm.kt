@@ -39,8 +39,9 @@ private fun GameSelectionDialogWithSearch(onDismissRequest: () -> Unit, onGameSe
     if (!enabled) return
 
     val searchText = remember { mutableStateOf("") }
-    val gamesFlow = gameViewModel.backlog
-    val games = gamesFlow.collectAsState(initial = listOf()).value
+    val games = gameViewModel.backlog
+        .collectAsState(initial = listOf())
+        .value
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -200,7 +201,7 @@ fun TaskInsertScreen(onEntryAddSuccess: () -> Unit, onCancelDialogSubmit: () -> 
         onSubmitClick = {
             if (it.validateAll()) {
                 taskViewModel.insert(
-                    task = it.toEntity(),
+                    entity = it.toEntity(),
                     onSuccess = {
                         successToast.show()
                         onEntryAddSuccess()
@@ -212,10 +213,9 @@ fun TaskInsertScreen(onEntryAddSuccess: () -> Unit, onCancelDialogSubmit: () -> 
             }
         },
         onCancelDialogSubmit = onCancelDialogSubmit,
-        state = taskViewModel.formState,
+        state = remember { TaskFormState() },
         topBarTitle = R.string.task_fab_add,
         submitButton = R.string.task_fab_add,
         gameViewModel = gameViewModel
     )
 }
-

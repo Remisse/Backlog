@@ -7,8 +7,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -16,27 +16,57 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.backlog.R
+import com.example.backlog.model.GameStatus
 import com.example.backlog.model.database.entity.Game
 import com.example.backlog.viewmodel.GameViewModel
-import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.*
 
 @Composable
-private fun ItemCardList(games: List<Game>, padding: PaddingValues, onEditClick: (Game) -> Unit,
-                         onDeleteClick: (Game) -> Unit) {
-    LazyColumn(modifier = Modifier.padding(padding)) {
+private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDeleteClick: (Game) -> Unit,
+                         onChangeStatusClick: (Int) -> Unit, modifier: Modifier = Modifier) {
+    val format = LookAndFeel.dateFormat(Locale.getDefault())
+
+    LazyColumn(modifier = modifier) {
         items(games) { game ->
             ItemCard(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 topText = {
-                    Text(
-                        text = game.title,
-                        style = MaterialTheme.typography.h6
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(gameStatusToResource(game.status)).uppercase(),
+                            color = gameStatusToColor(game.status),
+                            style = MaterialTheme.typography.caption
+                        )
+                        Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+                        Text(
+                            text = game.title,
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                    }
                 },
-                subText = { Text(text = stringResource(gameStatusToResource(game.status))) },
-                hiddenText = { Text(text = game.platform) },
-                onEditClick = { onEditClick(game) },
+                subText = { },
+                hiddenText = {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        CardSubtitleTextIcon(text = game.platform, imageVector = Icons.Outlined.VideogameAsset)
+                        game.releaseDate?.let {
+                            CardSubtitleTextIcon(
+                                text = format.format(LocalDate.ofEpochDay(it)),
+                                imageVector = Icons.Default.Event
+                            )
+                        }
+                        game.genre.takeIf { it != "" }
+                            ?.let { CardSubtitleTextIcon(text = it, imageVector = Icons.Outlined.Category) }
+                        game.developer.takeIf { it != "" }
+                            ?.let { CardSubtitleTextIcon(text = it, imageVector = Icons.Outlined.Code) }
+                        game.publisher.takeIf { it != "" }
+                            ?.let { CardSubtitleTextIcon(text = it, imageVector = Icons.Outlined.GroupWork) }
+                    }
+                },
+                onChangeStatusClick = { onChangeStatusClick(game.uid) },
+                onEditClick = { onEditClick(game.uid) },
                 onDeleteClick = { onDeleteClick(game) }
             )
         }
@@ -46,24 +76,10 @@ private fun ItemCardList(games: List<Game>, padding: PaddingValues, onEditClick:
 @Composable
 private fun BacklogMiniFabs(onOnlineSearchClick: () -> Unit, onCreateClick: () -> Unit) {
     val subButtonHeight = 36.dp
-    val subButtonFontSize = 10.sp
+    val subButtonFontSize = (9.5).sp
     val subButtonIconSize = 16.dp
     val subButtonColor = MaterialTheme.colors.secondaryVariant
 
-    ExtendedFloatingActionButton(
-        text = { Text(
-            text = stringResource(R.string.backlog_fab_onlinesearch).uppercase(),
-            fontSize = subButtonFontSize
-        ) },
-        onClick = onOnlineSearchClick,
-        icon = { Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = null,
-            modifier = Modifier.size(subButtonIconSize)
-        ) },
-        modifier = Modifier.height(subButtonHeight),
-        backgroundColor = subButtonColor
-    )
     ExtendedFloatingActionButton(
         text = { Text(
             text = stringResource(R.string.backlog_fab_create).uppercase(),
@@ -78,58 +94,83 @@ private fun BacklogMiniFabs(onOnlineSearchClick: () -> Unit, onCreateClick: () -
         modifier = Modifier.height(subButtonHeight),
         backgroundColor = subButtonColor
     )
+    ExtendedFloatingActionButton(
+        text = { Text(
+            text = stringResource(R.string.backlog_fab_onlinesearch).uppercase(),
+            fontSize = subButtonFontSize
+        ) },
+        onClick = onOnlineSearchClick,
+        icon = { Icon(
+            imageVector = Icons.Default.Public,
+            contentDescription = null,
+            modifier = Modifier.size(subButtonIconSize)
+        ) },
+        modifier = Modifier.height(subButtonHeight),
+        backgroundColor = subButtonColor
+    )
 }
 
 @Composable
-fun BacklogScreen(onCreateButtonClick: () -> Unit, onOnlineSearchButtonClick: () -> Unit,
-                  onEditCardClick: (Game) -> Unit, fabModifier: Modifier,
-                  gameViewModel: GameViewModel) {
-    val gamesFlow = gameViewModel.backlog
+fun BacklogFab(modifier: Modifier = Modifier, onOnlineSearchButtonClick: () -> Unit,
+               onCreateButtonClick: () -> Unit) {
+    ActionsFab(
+        textRes = R.string.backlog_fab_add,
+        icon = Icons.Default.Add,
+        modifier = modifier
+    ) {
+        BacklogMiniFabs(
+            onOnlineSearchClick = onOnlineSearchButtonClick,
+            onCreateClick = onCreateButtonClick
+        )
+    }
+}
+
+@Composable
+fun BacklogScreen(onEditCardClick: (Int) -> Unit, gameViewModel: GameViewModel) {
+    val gameUidStatusUpdate: MutableState<Int?> = remember { mutableStateOf(null) }
+    val resetChangeState = { gameUidStatusUpdate.value = null }
 
     val gameUidToDelete: MutableState<Int?> = remember { mutableStateOf(null) }
-
+    val resetDelete = { gameUidToDelete.value = null }
     val failureToast = Toast.makeText(LocalContext.current, stringResource(R.string.delete_failure_toast), Toast.LENGTH_SHORT)
-    val resetDeleteState = { gameUidToDelete.value = null }
 
     if (gameUidToDelete.value != null) {
         DeleteDialog(
-            onDismissRequest = resetDeleteState,
+            onDismissRequest = resetDelete,
             onConfirmDeleteClick = {
                 gameViewModel.delete(
                     gameUidToDelete.value!!,
-                    onSuccess = resetDeleteState,
+                    onSuccess = resetDelete,
                     onFailure = {
-                        resetDeleteState()
+                        resetDelete()
                         failureToast.show()
                     }
                 )
             },
-            onCancelClick = resetDeleteState,
+            onCancelClick = resetDelete,
             body = R.string.game_delete_dialog_body
         )
     }
-    Scaffold(
-        backgroundColor = MaterialTheme.colors.background,
-        floatingActionButton = {
-            ActionsFab(
-                textRes = R.string.backlog_fab_add,
-                icon = Icons.Default.Add,
-                modifier = fabModifier
-            ) {
-                BacklogMiniFabs(
-                    onOnlineSearchClick = onOnlineSearchButtonClick,
-                    onCreateClick = onCreateButtonClick
-                )
-            }
-        }
-    ) { padding ->
-        gamesFlow.collectAsState(initial = listOf()).value.apply {
-            ItemCardList(
-                games = this,
-                padding = padding,
-                onEditClick = onEditCardClick,
-                onDeleteClick = { game -> gameUidToDelete.value = game.uid }
+    if (gameUidStatusUpdate.value != null) {
+        Surface(shape = LookAndFeel.DialogSurfaceShape, modifier = Modifier.padding(16.dp)) {
+            StatusMenu(
+                expanded = gameUidStatusUpdate.value != null,
+                onSelect = { status: GameStatus ->
+                    gameViewModel.setStatus(gameUidStatusUpdate.value!!, status)
+                    resetChangeState()
+                },
+                onDismissRequest = resetChangeState,
+                toColor = { gameStatusToColor(it) },
+                toResource = { gameStatusToResource(it) }
             )
         }
+    }
+    gameViewModel.backlog.collectAsState(initial = listOf()).value.apply {
+        ItemCardList(
+            games = this,
+            onChangeStatusClick = { gameUidStatusUpdate.value = it },
+            onEditClick = onEditCardClick,
+            onDeleteClick = { gameUidToDelete.value = it.uid }
+        )
     }
 }
