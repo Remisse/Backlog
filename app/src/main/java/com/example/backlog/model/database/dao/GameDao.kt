@@ -1,6 +1,7 @@
 package com.example.backlog.model.database.dao
 
 import androidx.room.*
+import com.example.backlog.model.GameStatus
 import com.example.backlog.model.database.entity.Game
 import kotlinx.coroutines.flow.Flow
 
@@ -20,4 +21,12 @@ interface GameDao {
     @Query("DELETE FROM game " +
             "WHERE game.uid == :uid")
     suspend fun delete(uid: Int): Int
+
+    @Update
+    suspend fun update(game: Game): Int
+
+    @Query("UPDATE game " +
+            "SET status = :status " +
+            "WHERE uid == :uid ")
+    suspend fun setStatus(uid: Int, status: GameStatus): Int
 }
