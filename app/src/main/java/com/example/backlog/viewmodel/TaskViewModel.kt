@@ -14,8 +14,7 @@ import java.util.concurrent.TimeUnit
 
 private const val WORK_TAG = "deadline"
 
-class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManager) : ViewModel(),
-    BacklogViewModel<Task> {
+class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManager) : ViewModel() {
 
     private val tasks: Flow<List<Task>> = dao.allTasks()
 
@@ -26,9 +25,9 @@ class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManag
         .map { list -> list.map { k -> Integer.parseInt(k) } }
         .asFlow()
 
-    override fun entityById(uid: Int): Flow<Task> = dao.taskById(uid)
+    fun entityById(uid: Int): Flow<Task> = dao.taskById(uid)
 
-    override fun insert(entity: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+    fun insert(entity: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
         if (dao.insert(entity) != 0L) {
             recreateDeadlineWorkRequest()
             onSuccess()
@@ -37,7 +36,7 @@ class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManag
         }
     }
 
-    override fun delete(uid: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+    fun delete(uid: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
         if (dao.delete(uid) != 0) {
             recreateDeadlineWorkRequest()
             onSuccess()
@@ -51,7 +50,7 @@ class TaskViewModel(private val dao: TaskDao, private val workManager: WorkManag
         recreateDeadlineWorkRequest()
     }
 
-    override fun update(entity: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+    fun update(entity: Task, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
         if (dao.update(entity) != 0) {
             recreateDeadlineWorkRequest()
             onSuccess()

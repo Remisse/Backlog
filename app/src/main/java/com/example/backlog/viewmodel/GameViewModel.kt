@@ -10,18 +10,18 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class GameViewModel(private val dao: GameDao) : ViewModel(), BacklogViewModel<Game> {
+class GameViewModel(private val dao: GameDao) : ViewModel() {
 
     val backlog: Flow<List<Game>> = dao.backlog()
 
-    override fun entityById(uid: Int): Flow<Game> {
+    fun entityById(uid: Int): Flow<Game> {
         return dao.gameById(uid)
     }
 
     /**
      * Launching a new coroutine to insert the data in a non-blocking way
      */
-    override fun insert(entity: Game, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+    fun insert(entity: Game, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
         if (dao.insert(entity) != 0L) {
             onSuccess()
         } else {
@@ -29,7 +29,7 @@ class GameViewModel(private val dao: GameDao) : ViewModel(), BacklogViewModel<Ga
         }
     }
 
-    override fun delete(uid: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
+    fun delete(uid: Int, onSuccess: () -> Unit, onFailure: () -> Unit) = viewModelScope.launch {
         if (dao.delete(uid) != 0) {
             onSuccess()
         } else {
@@ -37,7 +37,7 @@ class GameViewModel(private val dao: GameDao) : ViewModel(), BacklogViewModel<Ga
         }
     }
 
-    override fun update(entity: Game, onSuccess: () -> Unit, onFailure: () -> Unit): Job = viewModelScope.launch {
+    fun update(entity: Game, onSuccess: () -> Unit, onFailure: () -> Unit): Job = viewModelScope.launch {
         if (dao.update(entity) != 0) {
             onSuccess()
         } else {
