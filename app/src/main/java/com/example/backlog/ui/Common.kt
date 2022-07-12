@@ -77,69 +77,73 @@ fun ItemCard(modifier: Modifier, exposedText: @Composable () -> Unit, hiddenText
         backgroundColor = MaterialTheme.colors.background,
         modifier = modifier
     ) {
-        Surface(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+        Surface(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
             Column(modifier = Modifier.animateContentSize()
-                .fillMaxWidth()
-                .wrapContentHeight()) {
+                .fillMaxWidth()) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    exposedText()
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { showActionMenu = !showActionMenu }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreHoriz,
-                                contentDescription = null
-                            )
-                        }
-                        if (hiddenText != null) {
-                            IconButton(onClick = { isExpanded = !isExpanded }) {
+                    Column(modifier = Modifier.weight(1.0f, true)) {
+                        exposedText()
+                    }
+                    Column(modifier = Modifier.weight(0.375f, false)) {
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = { showActionMenu = !showActionMenu }) {
                                 Icon(
-                                    imageVector = Icons.Default.ExpandMore,
-                                    contentDescription = null,
-                                    modifier = Modifier.rotate(rotation.value)
+                                    imageVector = Icons.Default.MoreHoriz,
+                                    contentDescription = null
                                 )
                             }
-                        }
-                        DropdownMenu(expanded = showActionMenu, onDismissRequest = { showActionMenu = false }) {
-                            DropdownMenuItem(onClick = {
-                                showActionMenu = false
-                                onChangeStatusClick()
-                            }) {
-                                Icon(imageVector = Icons.Outlined.Check, contentDescription = null)
-                                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                                Text(stringResource(R.string.change_status_button))
+                            if (hiddenText != null) {
+                                IconButton(onClick = { isExpanded = !isExpanded }) {
+                                    Icon(
+                                        imageVector = Icons.Default.ExpandMore,
+                                        contentDescription = null,
+                                        modifier = Modifier.rotate(rotation.value)
+                                    )
+                                }
                             }
-                            DropdownMenuItem(onClick = {
-                                showActionMenu = false
-                                onEditClick()
-                            }) {
-                                Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
-                                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                                Text(stringResource(R.string.edit_button))
-                            }
-                            Divider()
-                            DropdownMenuItem(onClick = {
-                                showActionMenu = false
-                                onDeleteClick()
-                            }) {
-                                Icon(imageVector = Icons.Outlined.Delete, contentDescription = null, tint = Color.Red)
-                                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                                Text(text = stringResource(R.string.card_delete_item), color = Color.Red)
+                            DropdownMenu(
+                                expanded = showActionMenu,
+                                onDismissRequest = { showActionMenu = false }
+                            ) {
+                                DropdownMenuItem(onClick = {
+                                    showActionMenu = false
+                                    onChangeStatusClick()
+                                }) {
+                                    Icon(imageVector = Icons.Outlined.Check, contentDescription = null)
+                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                    Text(stringResource(R.string.change_status_button))
+                                }
+                                DropdownMenuItem(onClick = {
+                                    showActionMenu = false
+                                    onEditClick()
+                                }) {
+                                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
+                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                    Text(stringResource(R.string.edit_button))
+                                }
+                                Divider()
+                                DropdownMenuItem(onClick = {
+                                    showActionMenu = false
+                                    onDeleteClick()
+                                }) {
+                                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = null, tint = Color.Red)
+                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                                    Text(text = stringResource(R.string.card_delete_item), color = Color.Red)
+                                }
                             }
                         }
                     }
                 }
-                Row(horizontalArrangement = Arrangement.Start) {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)) {
-                        if (isExpanded) {
-                            hiddenText?.invoke()
-                        }
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)) {
+                    if (isExpanded) {
+                        hiddenText?.invoke()
                     }
                 }
             }
@@ -349,6 +353,7 @@ fun DeleteDialog(onDismissRequest: () -> Unit, onConfirmDeleteClick: () -> Unit,
 @Composable
 inline fun <reified T : Enum<T>> StatusMenu(
     expanded: Boolean,
+    modifier: Modifier = Modifier,
     crossinline onSelect: (T) -> Unit,
     noinline onDismissRequest: () -> Unit,
     crossinline toColor: (T) -> Color,
@@ -357,7 +362,7 @@ inline fun <reified T : Enum<T>> StatusMenu(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        modifier = Modifier.wrapContentSize()
+        modifier = modifier
     ) {
         enumValues<T>().forEach { status ->
             DropdownMenuItem(onClick = { onSelect(status) }) {

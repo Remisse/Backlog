@@ -3,17 +3,23 @@ package com.example.backlog.ui.form
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
@@ -26,50 +32,44 @@ import java.time.LocalDate
 import java.util.*
 
 @Composable
-private fun StatusMenu(value: GameStatus, onSelect: (GameStatus) -> Unit) {
-    val isExpanded: MutableState<Boolean> = remember { mutableStateOf(false) }
+private fun FieldStatusMenu(value: GameStatus, onSelect: (GameStatus) -> Unit) {
+    var isExpanded by remember { mutableStateOf(false) }
 
-    val source = remember { MutableInteractionSource() }
-    if (source.collectIsPressedAsState().value) {
-        isExpanded.value = !isExpanded.value
-    }
+    val transition = updateTransition(targetState = isExpanded, label = "ExpandClick")
+    val rotation = transition.animateFloat(label = "") { if (!it) 0f else 180f }
 
     Column(
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.End
     ) {
         TextField(
             label = { Text(text = stringResource(R.string.insert_status_label)) },
             value = stringResource(gameStatusToResource(value)),
             onValueChange = { },
             trailingIcon = {
-                Icon(
-                    imageVector = if (isExpanded.value) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                    contentDescription = null
-                )
+                IconButton(onClick = { isExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.ExpandMore,
+                        contentDescription = null,
+                        modifier = Modifier.rotate(rotation.value)
+                    )
+                }
             },
             modifier = LookAndFeel.FieldModifier,
             readOnly = true,
-            shape = LookAndFeel.FieldShape,
-            interactionSource = source,
-            colors = TextFieldDefaults.textFieldColors(textColor = gameStatusToColor(value))
+            shape = LookAndFeel.FieldShape
         )
-        DropdownMenu(
-            expanded = isExpanded.value,
-            onDismissRequest = { isExpanded.value = false },
-            modifier = LookAndFeel.FieldModifier
-        ) {
-            GameStatus.values().forEach { status ->
-                DropdownMenuItem(onClick = {
-                    isExpanded.value = false
-                    onSelect(status)
-                }) {
-                    Text(
-                        text = stringResource(gameStatusToResource(status)),
-                        color = gameStatusToColor(status)
-                    )
-                }
-            }
-        }
+        StatusMenu<GameStatus>(
+            expanded = isExpanded,
+            onSelect = {
+                isExpanded = false
+                onSelect(it)
+            },
+            onDismissRequest = { isExpanded = false },
+            toColor = { gameStatusToColor(it) },
+            toResource = { gameStatusToResource(it) }
+        )
     }
 }
 
@@ -116,9 +116,17 @@ fun GameFormContent(state: GameFormState, onCancelDialogConfirm: () -> Unit,
         SubScreenTopBar(heading = R.string.insert_topbar) { state.showCancelDialog = true }
     }) {
         Column(
-            modifier = LookAndFeel.FieldColumnModifier,
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
             verticalArrangement = LookAndFeel.FieldColumnVerticalArrangement
         ) {
+            Text(
+                text = stringResource(R.string.required_fields_heading),
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.subtitle1
+            )
             TextField(
                 value = state.title.value,
                 onValueChange = { state.title.value = it },
@@ -126,7 +134,6 @@ fun GameFormContent(state: GameFormState, onCancelDialogConfirm: () -> Unit,
                 label = { Text(stringResource(R.string.insert_game_title)) },
                 modifier = LookAndFeel.FieldModifier
             )
-            Spacer(modifier = Modifier.padding(vertical = 2.dp))
             TextField(
                 value = state.platform.value,
                 onValueChange = { state.platform.value = it },
@@ -134,6 +141,13 @@ fun GameFormContent(state: GameFormState, onCancelDialogConfirm: () -> Unit,
                 label = { Text(stringResource(R.string.insert_game_platform)) },
                 modifier = LookAndFeel.FieldModifier,
                 shape = LookAndFeel.FieldShape
+            )
+            Spacer(modifier = Modifier.padding(vertical = 2.dp))
+            Text(
+                text = stringResource(R.string.optional_fields_heading),
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.subtitle1,
+                modifier = LookAndFeel.TextFieldTitleModifier
             )
             TextField(
                 value = state.genre.value,
@@ -170,17 +184,12 @@ fun GameFormContent(state: GameFormState, onCancelDialogConfirm: () -> Unit,
                 shape = LookAndFeel.FieldShape
             )
             Spacer(modifier = Modifier.padding(vertical = 2.dp))
-            StatusMenu(
+            FieldStatusMenu(
                 value = state.status.value,
                 onSelect = {
                     state.status.value = it
                 })
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                onClick = { onCommitButtonClick(state) }
-            ) {
+            Button(modifier = Modifier.fillMaxWidth(), onClick = { onCommitButtonClick(state) }) {
                 Text(stringResource(button).uppercase())
             }
         }

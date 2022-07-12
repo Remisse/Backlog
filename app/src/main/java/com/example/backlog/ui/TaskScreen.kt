@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material.icons.outlined.AddTask
 import androidx.compose.runtime.*
@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
@@ -47,7 +48,7 @@ private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier = Modifie
                         CardSubtitleTextIcon(text = item.gameTitle, imageVector = Icons.Default.VideogameAsset)
                         item.task.deadlineDateEpochDay?.let { CardSubtitleTextIcon(
                             text = format.format(LocalDate.ofEpochDay(it)),
-                            imageVector = Icons.Default.CalendarToday
+                            imageVector = Icons.Default.Event
                         ) }
                     }
                 },
@@ -100,10 +101,10 @@ fun TaskScreen(onTaskEditClick: (Int) -> Unit, taskViewModel: TaskViewModel = vi
     }
     if (taskUidChangeState.value != null) {
         Surface(shape = LookAndFeel.DialogSurfaceShape, modifier = Modifier.padding(16.dp)) {
-            StatusMenu(
+            StatusMenu<TaskStatus>(
                 expanded = taskUidChangeState.value != null,
-                onSelect = { status: TaskStatus ->
-                    taskViewModel.setStatus(taskUidChangeState.value!!, status)
+                onSelect = {
+                    taskViewModel.setStatus(taskUidChangeState.value!!, it)
                     resetChangeState()
                 },
                 onDismissRequest = resetChangeState,
@@ -113,11 +114,25 @@ fun TaskScreen(onTaskEditClick: (Int) -> Unit, taskViewModel: TaskViewModel = vi
         }
     }
     tasksFlow.collectAsState(initial = listOf()).value.apply {
-        TaskList(
-            list = this,
-            onChangeStatusClick = { taskUidChangeState.value = it },
-            onEditClick = onTaskEditClick,
-            onDeleteClick = { uid -> taskUidToDelete.value = uid }
-        )
+        if (this.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.tasks_empty),
+                    color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            TaskList(
+                list = this,
+                onChangeStatusClick = { taskUidChangeState.value = it },
+                onEditClick = onTaskEditClick,
+                onDeleteClick = { uid -> taskUidToDelete.value = uid }
+            )
+        }
     }
 }

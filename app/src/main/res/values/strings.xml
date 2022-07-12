@@ -68,4 +68,8 @@
     <string name="profile_tasks_subheading">About your tasks</string>
     <string name="profile_tasks_no_data">No data to show. Add some tasks first.</string>
     <string name="change_status_button">Set status</string>
+    <string name="backlog_empty">Your backlog is empty.</string>
+    <string name="tasks_empty">Your task list is empty.</string>
+    <string name="required_fields_heading">Basic info (required)</string>
+    <string name="optional_fields_heading">Other details</string>
 </resources>

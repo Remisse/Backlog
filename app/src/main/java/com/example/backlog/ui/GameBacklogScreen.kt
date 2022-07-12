@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.backlog.R
@@ -30,7 +31,7 @@ private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDelete
     LazyColumn(modifier = modifier) {
         items(games) { game ->
             ItemCard(
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                 exposedText = {
                     Column(
                         horizontalAlignment = Alignment.Start
@@ -44,6 +45,7 @@ private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDelete
                             text = game.title,
                             style = MaterialTheme.typography.subtitle2
                         )
+                        Spacer(modifier = Modifier.padding(vertical = 2.dp))
                     }
                 },
                 hiddenText = {
@@ -52,7 +54,7 @@ private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDelete
                         game.releaseDate?.let {
                             CardSubtitleTextIcon(
                                 text = format.format(LocalDate.ofEpochDay(it)),
-                                imageVector = Icons.Default.Event
+                                imageVector = Icons.Default.CalendarToday
                             )
                         }
                         game.genre.takeIf { it != "" }
@@ -151,10 +153,10 @@ fun BacklogScreen(onEditCardClick: (Int) -> Unit, gameViewModel: GameViewModel) 
     }
     if (gameUidStatusUpdate.value != null) {
         Surface(shape = LookAndFeel.DialogSurfaceShape, modifier = Modifier.padding(16.dp)) {
-            StatusMenu(
+            StatusMenu<GameStatus>(
                 expanded = gameUidStatusUpdate.value != null,
-                onSelect = { status: GameStatus ->
-                    gameViewModel.setStatus(gameUidStatusUpdate.value!!, status)
+                onSelect = {
+                    gameViewModel.setStatus(gameUidStatusUpdate.value!!, it)
                     resetChangeState()
                 },
                 onDismissRequest = resetChangeState,
@@ -164,11 +166,25 @@ fun BacklogScreen(onEditCardClick: (Int) -> Unit, gameViewModel: GameViewModel) 
         }
     }
     gameViewModel.backlog.collectAsState(initial = listOf()).value.apply {
-        ItemCardList(
-            games = this,
-            onChangeStatusClick = { gameUidStatusUpdate.value = it },
-            onEditClick = onEditCardClick,
-            onDeleteClick = { gameUidToDelete.value = it.uid }
-        )
+        if (this.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.backlog_empty),
+                    color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            ItemCardList(
+                games = this,
+                onChangeStatusClick = { gameUidStatusUpdate.value = it },
+                onEditClick = onEditCardClick,
+                onDeleteClick = { gameUidToDelete.value = it.uid }
+            )
+        }
     }
 }
