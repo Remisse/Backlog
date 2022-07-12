@@ -12,9 +12,9 @@ import kotlin.reflect.full.declaredMemberProperties
 
 data class TaskFormState(
     var uid: Int = 0,
-    val description: FormElement<String> = FormElement("", listOf(Required())),
-    val gameId: FormElement<Int?> = FormElement(null, listOf(Required())),
-    val deadline: FormElement<LocalDate?> = FormElement(null, listOf(Required()))
+    val description: FormElement<String> = FormElement("", Required()),
+    val gameId: FormElement<Int?> = FormElement(null, Required()),
+    val deadline: FormElement<LocalDate?> = FormElement(null, Required())
 ) : FormState<Task> {
 
     var gameAndPlatform by mutableStateOf("")

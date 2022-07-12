@@ -11,13 +11,13 @@ import kotlin.reflect.full.declaredMemberProperties
 
 data class GameFormState(
     var uid: Int = 0,
-    val title: FormElement<String> = FormElement("", listOf(Required())),
-    val platform: FormElement<String> = FormElement("", listOf(Required())),
+    val title: FormElement<String> = FormElement("", Required()),
+    val platform: FormElement<String> = FormElement("", Required()),
     val genre: FormElement<String> = FormElement(""),
     val releaseDate: FormElement<LocalDate?> = FormElement(null),
     val developer: FormElement<String> = FormElement(""),
     val publisher: FormElement<String> = FormElement(""),
-    val status: FormElement<GameStatus> = FormElement(GameStatus.NOT_STARTED, listOf(Required()))
+    val status: FormElement<GameStatus> = FormElement(GameStatus.NOT_STARTED, Required())
 ) : FormState<Game> {
 
     var showCalendar by mutableStateOf(false)

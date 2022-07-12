@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import com.example.backlog.viewmodel.validator.Validator
 
 class FormElement<T>(startingValue: T,
-                     private val validators: List<Validator<T>> = emptyList()) {
+                     private vararg val validators: Validator<T>) {
 
     var value: T by mutableStateOf(startingValue)
 
@@ -22,7 +22,7 @@ class FormElement<T>(startingValue: T,
      * an empty list otherwise
      */
     fun validate(): List<String> {
-        _errors.value = validators.filter { !it.validate(value) }
+        _errors.value = validators.filter { it.validate(value) }
             .map { it.error }
 
         return _errors.value.toList()
