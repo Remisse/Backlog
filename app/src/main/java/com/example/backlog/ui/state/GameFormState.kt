@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.backlog.model.GameStatus
 import com.example.backlog.model.database.entity.Game
-import com.example.backlog.viewmodel.validator.Required
+import com.example.backlog.ui.state.validator.Required
 import java.time.LocalDate
 import kotlin.reflect.full.declaredMemberProperties
 

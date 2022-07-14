@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
 import com.example.backlog.model.GameStatus
-import com.example.backlog.ui.*
+import com.example.backlog.ui.common.*
 import com.example.backlog.ui.interop.CalendarDialog
 import com.example.backlog.ui.state.GameFormState
 import com.example.backlog.viewmodel.GameViewModel

@@ -1,7 +1,7 @@
 package com.example.backlog.ui.state
 
 import androidx.compose.runtime.*
-import com.example.backlog.viewmodel.validator.Validator
+import com.example.backlog.ui.state.validator.Validator
 
 class FormElement<T>(startingValue: T,
                      private vararg val validators: Validator<T>) {

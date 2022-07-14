@@ -1,4 +1,4 @@
-package com.example.backlog.ui
+package com.example.backlog.ui.common
 
 import androidx.compose.ui.graphics.Color
 import com.example.backlog.R

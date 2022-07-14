@@ -1,4 +1,4 @@
-package com.example.backlog.viewmodel.validator
+package com.example.backlog.ui.state.validator
 
 class Required<in T> : Validator<T> {
 

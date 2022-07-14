@@ -1,4 +1,4 @@
-package com.example.backlog.viewmodel.validator
+package com.example.backlog.ui.state.validator
 
 interface Validator<in T> {
 

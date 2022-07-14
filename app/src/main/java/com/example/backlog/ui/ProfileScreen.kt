@@ -1,13 +1,11 @@
 package com.example.backlog.ui
 
 import android.annotation.SuppressLint
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,12 +21,12 @@ import androidx.compose.ui.unit.dp
 import com.example.backlog.R
 import com.example.backlog.model.GameStatus
 import com.example.backlog.model.TaskStatus
+import com.example.backlog.ui.common.*
 import com.example.backlog.viewmodel.GameViewModel
 import com.example.backlog.viewmodel.TaskViewModel
 import com.github.tehras.charts.piechart.PieChart
 import com.github.tehras.charts.piechart.PieChartData
 import com.github.tehras.charts.piechart.PieChartData.Slice
-import kotlin.reflect.KClass
 
 @Composable
 private fun OutlinedSurface(modifier: Modifier = Modifier, content: @Composable () -> Unit) {

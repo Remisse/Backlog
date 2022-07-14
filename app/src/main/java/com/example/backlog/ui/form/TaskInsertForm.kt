@@ -23,14 +23,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
 import com.example.backlog.model.database.entity.Game
 import com.example.backlog.ui.*
+import com.example.backlog.ui.common.*
 import com.example.backlog.ui.interop.CalendarDialog
 import com.example.backlog.viewmodel.GameViewModel
 import com.example.backlog.viewmodel.TaskViewModel
 import com.example.backlog.ui.state.TaskFormState
-import java.text.DateFormat
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.*
 
 @Composable

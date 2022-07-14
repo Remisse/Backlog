@@ -6,15 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.backlog.ui.*
+import com.example.backlog.ui.common.BottomNavigationBar
+import com.example.backlog.ui.common.TopMenuBar
+import com.example.backlog.ui.common.getParentRoute
 import com.example.backlog.ui.theme.BacklogTheme
 import com.example.backlog.util.AppContainer
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private const val MAIN_DESTINATION = "main"
 

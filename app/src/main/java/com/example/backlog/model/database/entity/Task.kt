@@ -6,7 +6,8 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
 import com.example.backlog.model.TaskStatus
 
-@Entity(foreignKeys = [ForeignKey(entity = Game::class,
+@Entity(foreignKeys = [ForeignKey(
+    entity = Game::class,
     parentColumns = ["uid"],
     childColumns = ["gameId"],
     onDelete = CASCADE)]
