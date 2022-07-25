@@ -87,6 +87,20 @@ private inline fun <reified T : Enum<T>> StatusPie(data: Map<T, Int>,
     }
 }
 
+@Composable
+fun SectionTitleText(text: String) {
+    Text(text = text, style = MaterialTheme.typography.subtitle1)
+}
+
+@Composable
+fun PlaceholderText(text: String) {
+    Text(
+        text = text,
+        color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+        textAlign = TextAlign.Center
+    )
+}
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(gameViewModel: GameViewModel, taskViewModel: TaskViewModel) {
@@ -107,40 +121,27 @@ fun ProfileScreen(gameViewModel: GameViewModel, taskViewModel: TaskViewModel) {
             style = MaterialTheme.typography.h6
         )
         Spacer(modifier = Modifier.padding(vertical = 4.dp))
-        Text(
-            text = stringResource(R.string.profile_games_subheading),
-            style = MaterialTheme.typography.subtitle1
-        )
+        SectionTitleText(text = stringResource(R.string.profile_games_subheading))
         if (backlog.isEmpty()) {
-            Text(
-                text = stringResource(R.string.profile_no_data),
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-                textAlign = TextAlign.Center
-            )
+            PlaceholderText(stringResource(R.string.profile_no_data))
         } else {
-            val counts: Map<GameStatus, Int> = GameStatus.values().associateBy(
-                keySelector = { status -> status },
-                valueTransform = { status -> backlog.filter { it.status == status }.size }
-            )
+            val counts: Map<GameStatus, Int> = countOccurrences(backlog.map { it.status })
             StatusPie(counts, { gameStatusToColor(it) }, { gameStatusToResource(it) })
         }
         Spacer(modifier = Modifier.padding(vertical = 4.dp))
-        Text(
-            text = stringResource(R.string.profile_tasks_subheading),
-            style = MaterialTheme.typography.subtitle1
-        )
+        SectionTitleText(text = stringResource(R.string.profile_tasks_subheading))
         if (tasks.isEmpty()) {
-            Text(
-                text = stringResource(R.string.profile_tasks_no_data),
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-                textAlign = TextAlign.Center
-            )
+            PlaceholderText(text = stringResource(R.string.profile_tasks_no_data))
         } else {
-            val counts: Map<TaskStatus, Int> = TaskStatus.values().associateBy(
-                keySelector = { status -> status },
-                valueTransform = { status -> tasks.filter { it.task.status == status }.size }
-            )
+            val counts: Map<TaskStatus, Int> = countOccurrences(tasks.map { it.task.status })
             StatusPie(counts, { taskStatusToColor(it) }, { taskStatusToResource(it) })
         }
     }
+}
+
+private inline fun <reified T : Enum<T>> countOccurrences(data: List<T>): Map<T, Int> {
+    return enumValues<T>().associateBy(
+        keySelector = { status -> status },
+        valueTransform = { status -> data.filter { it == status }.size }
+    )
 }
