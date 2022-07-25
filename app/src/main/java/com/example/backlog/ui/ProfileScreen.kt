@@ -28,6 +28,13 @@ import com.github.tehras.charts.piechart.PieChart
 import com.github.tehras.charts.piechart.PieChartData
 import com.github.tehras.charts.piechart.PieChartData.Slice
 
+/*
+ * TODO
+ * - Name
+ * - Avatar (?)
+ * - Completed and dropped games by genre, platform and developer
+ */
+
 @Composable
 private fun OutlinedSurface(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Surface(

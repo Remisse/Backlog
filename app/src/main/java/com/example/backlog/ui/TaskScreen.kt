@@ -25,6 +25,11 @@ import com.example.backlog.viewmodel.TaskViewModel
 import java.time.LocalDate
 import java.util.*
 
+/*
+ * TODO
+ * Filter by game
+ */
+
 @Composable
 private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier = Modifier, onEditClick: (Int) -> Unit,
                      onDeleteClick: (Int?) -> Unit, onChangeStatusClick: (Int) -> Unit) {

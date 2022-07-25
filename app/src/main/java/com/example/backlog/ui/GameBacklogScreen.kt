@@ -24,6 +24,12 @@ import com.example.backlog.viewmodel.GameViewModel
 import java.time.LocalDate
 import java.util.*
 
+/*
+ * TODO
+ * Filters (by status, platform, developer...)
+ * Covers (?)
+ */
+
 @Composable
 private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDeleteClick: (Game) -> Unit,
                          onChangeStatusClick: (Int) -> Unit, modifier: Modifier = Modifier) {
