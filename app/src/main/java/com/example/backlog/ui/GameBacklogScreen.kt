@@ -81,39 +81,18 @@ private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDelete
 }
 
 @Composable
-private fun BacklogMiniFabs(onOnlineSearchClick: () -> Unit, onCreateClick: () -> Unit) {
-    val subButtonHeight = 36.dp
-    val subButtonFontSize = (9.5).sp
-    val subButtonIconSize = 16.dp
-    val subButtonColor = MaterialTheme.colors.secondaryVariant
-
+private fun MiniFab(text: String, onClick: () -> Unit, imageVector: ImageVector,
+                    contentDescription: String?) {
     ExtendedFloatingActionButton(
-        text = { Text(
-            text = stringResource(R.string.backlog_fab_create).uppercase(),
-            fontSize = subButtonFontSize
-        ) },
-        onClick = onCreateClick,
+        text = { Text(text = text, fontSize = 9.sp) },
+        onClick = onClick,
         icon = { Icon(
-            imageVector = Icons.Default.Create,
-            contentDescription = null,
-            modifier = Modifier.size(subButtonIconSize)
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(16.dp)
         ) },
-        modifier = Modifier.height(subButtonHeight),
-        backgroundColor = subButtonColor
-    )
-    ExtendedFloatingActionButton(
-        text = { Text(
-            text = stringResource(R.string.backlog_fab_onlinesearch).uppercase(),
-            fontSize = subButtonFontSize
-        ) },
-        onClick = onOnlineSearchClick,
-        icon = { Icon(
-            imageVector = Icons.Default.Public,
-            contentDescription = null,
-            modifier = Modifier.size(subButtonIconSize)
-        ) },
-        modifier = Modifier.height(subButtonHeight),
-        backgroundColor = subButtonColor
+        modifier = Modifier.height(36.dp),
+        backgroundColor = MaterialTheme.colors.secondaryVariant
     )
 }
 
@@ -125,9 +104,17 @@ fun BacklogFab(modifier: Modifier = Modifier, onOnlineSearchButtonClick: () -> U
         icon = Icons.Default.Add,
         modifier = modifier
     ) {
-        BacklogMiniFabs(
-            onOnlineSearchClick = onOnlineSearchButtonClick,
-            onCreateClick = onCreateButtonClick
+        MiniFab(
+            text = stringResource(R.string.backlog_fab_create).uppercase(),
+            onClick = onCreateButtonClick,
+            imageVector = Icons.Default.Create,
+            contentDescription = null
+        )
+        MiniFab(
+            text = stringResource(R.string.backlog_fab_onlinesearch).uppercase(),
+            onClick = onOnlineSearchButtonClick,
+            imageVector = Icons.Default.Public,
+            contentDescription = null
         )
     }
 }
