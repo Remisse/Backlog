@@ -22,7 +22,7 @@ class FormElement<T>(startingValue: T,
      * an empty list otherwise
      */
     fun validate(): List<String> {
-        _errors.value = validators.filter { it.validate(value) }
+        _errors.value = validators.filter { !it.validate(value) }
             .map { it.error }
 
         return _errors.value.toList()
