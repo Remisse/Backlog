@@ -24,7 +24,7 @@ data class TaskFormState(
     var showCancelDialog by mutableStateOf(false)
 
     override fun toEntity(): Task {
-        if (!validateAll()) throw IllegalStateException()
+        if (validateAll().isNotEmpty()) throw IllegalStateException()
         return Task(
             uid = uid,
             description = description.value,
@@ -41,9 +41,9 @@ data class TaskFormState(
         deadline.value = entity.deadlineDateEpochDay?.let { LocalDate.ofEpochDay(it) }
     }
 
-    override fun validateAll(): Boolean {
+    override fun validateAll(): List<String> {
         return this::class.declaredMemberProperties.map { it.getter.call(this) }
             .filterIsInstance<FormElement<*>>()
-            .all { it.validate().isEmpty() }
+            .flatMap { it.validate() }
     }
 }

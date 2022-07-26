@@ -24,7 +24,7 @@ data class GameFormState(
     var showCancelDialog by mutableStateOf(false)
 
     override fun toEntity(): Game {
-        if (!validateAll()) throw IllegalStateException("Form has invalid data")
+        if (validateAll().isNotEmpty()) throw IllegalStateException("Form has invalid data")
         return Game(
             uid = uid,
             title = title.value,
@@ -50,9 +50,9 @@ data class GameFormState(
     }
 
     // TODO Extract abstract class
-    override fun validateAll(): Boolean {
+    override fun validateAll(): List<String> {
         return this::class.declaredMemberProperties.map { it.getter.call(this) }
             .filterIsInstance<FormElement<*>>()
-            .all { it.validate().isEmpty() }
+            .flatMap { it.validate() }
     }
 }

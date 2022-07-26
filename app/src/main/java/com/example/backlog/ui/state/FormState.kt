@@ -6,5 +6,5 @@ interface FormState<T> {
 
     fun fromEntity(entity: T)
 
-    fun validateAll(): Boolean
+    fun validateAll(): List<String>
 }
