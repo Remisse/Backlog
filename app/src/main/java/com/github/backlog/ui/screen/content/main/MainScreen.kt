@@ -7,9 +7,9 @@ import com.github.backlog.Section
 import com.github.backlog.ui.components.BottomNavigationBar
 import com.github.backlog.ui.components.TopMenuBar
 import com.github.backlog.ui.screen.BaseScreen
-import com.github.backlog.util.AppContainer
+import com.github.backlog.ui.screen.ViewModelContainer
 
-abstract class MainScreen(appContainer: AppContainer) : BaseScreen(appContainer) {
+abstract class MainScreen(viewModelContainer: ViewModelContainer) : BaseScreen(viewModelContainer) {
 
     @Composable
     protected abstract fun TopBarExtraButtons()

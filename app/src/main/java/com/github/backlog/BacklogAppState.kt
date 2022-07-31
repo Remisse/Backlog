@@ -1,5 +1,6 @@
 package com.github.backlog
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
@@ -16,74 +17,85 @@ import com.github.backlog.ui.screen.content.secondary.gameform.GameFormAdd
 import com.github.backlog.ui.screen.content.secondary.gameform.GameFormEdit
 import com.github.backlog.ui.screen.content.secondary.taskform.TaskFormAdd
 import com.github.backlog.ui.screen.content.secondary.taskform.TaskFormEdit
-import com.github.backlog.util.AppContainer
+import com.github.backlog.util.ViewModelContainerAccessor
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class BacklogAppState(val scaffoldState: ScaffoldState,
                       val navController: NavHostController,
-                      appContainer: AppContainer
+                      appContainer: ViewModelContainerAccessor
 ) {
-    val main: List<BacklogScreen> = listOf(
+    val mainScreens: List<BacklogScreen> = listOf(
         LibraryScreen(
             onEditCardButtonClick = { navController.navigate("${gameFormEdit.section.route}/${it}") },
             onOnlineSearchButtonClick = { /* TODO */},
             onCreateButtonClick = { navController.navigate(gameFormAdd.section.route) },
-            appContainer = appContainer
+            viewModelContainer = appContainer.getViewModelContainer()
         ),
         TaskScreenContent(
             onTaskEditClick = { navController.navigate("${taskFormEdit.section.route}/${it}") },
             onCreateClick = { navController.navigate(taskFormAdd.section.route) },
-            appContainer = appContainer
+            viewModelContainer = appContainer.getViewModelContainer()
         ),
-        ProfileScreen(appContainer)
+        ProfileScreen(viewModelContainer = appContainer.getViewModelContainer())
     )
 
     val gameFormAdd = GameFormAdd(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        appContainer = appContainer
+        viewModelContainer = appContainer.getViewModelContainer()
     )
 
     val gameFormEdit = GameFormEdit(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        appContainer = appContainer
+        viewModelContainer = appContainer.getViewModelContainer()
     )
 
     val taskFormAdd = TaskFormAdd(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        appContainer = appContainer
+        viewModelContainer = appContainer.getViewModelContainer()
     )
 
     val taskFormEdit = TaskFormEdit(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        appContainer = appContainer
+        viewModelContainer = appContainer.getViewModelContainer()
     )
 
-    private val sub: List<BacklogScreen> = listOf(
+    private val secondaryScreens: List<BacklogScreen> = listOf(
         gameFormAdd,
         gameFormEdit,
         taskFormAdd,
         taskFormEdit
     )
 
-    val startingScreen: BacklogScreen = main[0]
-
-    private val _currentScreen: MutableState<BacklogScreen> = mutableStateOf(startingScreen)
-    private val _from: MutableState<BacklogScreen> = mutableStateOf(_currentScreen.value)
-
+    /**
+     * Returns the route name stripped of all arguments, if any.
+     */
     private fun baseRoute(route: String): String {
         return route.split("?", "/")[0]
     }
 
+    val startingScreen: BacklogScreen = mainScreens[0]
+
+    /*
+     * Source of truth for the currently active screen. Used to dynamically assign Composables
+     * to the scaffold.
+     */
+    private val _currentScreen: MutableState<BacklogScreen> = mutableStateOf(startingScreen)
+    private val _from: MutableState<BacklogScreen> = mutableStateOf(_currentScreen.value)
+
     init {
         _currentScreen.value = startingScreen
+
+        // When navigating to a new screen, reset the
         navController.addOnDestinationChangedListener { _, destination, _ ->
             _from.value = _currentScreen.value
-            _currentScreen.value = main.plus(sub)
+            _currentScreen.value = mainScreens.plus(secondaryScreens)
                 .find { baseRoute(it.section.route) == baseRoute(destination.route.orEmpty()) }!!
+
+            appContainer.clear()
         }
     }
 
@@ -95,14 +107,22 @@ class BacklogAppState(val scaffoldState: ScaffoldState,
         return _from.value
     }
 
-    val bottomNavBarSections: List<Section> = main.map { it.section }
+    val bottomNavBarSections: List<Section> = mainScreens.map { it.section }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    fun slideDirection() : AnimatedContentScope.SlideDirection {
+        if (mainScreens.indexOf(currentScreen()) > mainScreens.indexOf(from())) {
+            return AnimatedContentScope.SlideDirection.Left
+        }
+        return AnimatedContentScope.SlideDirection.Right
+    }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun rememberBacklogAppState(scaffoldState: ScaffoldState = rememberScaffoldState(),
                             navController: NavHostController = rememberAnimatedNavController(),
-                            appContainer: AppContainer
+                            appContainer: ViewModelContainerAccessor
 ): BacklogAppState {
     return remember(scaffoldState, navController, appContainer) {
         BacklogAppState(scaffoldState, navController, appContainer)

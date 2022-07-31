@@ -27,34 +27,42 @@ import com.example.backlog.R
 import com.github.backlog.Section
 import com.github.backlog.model.GameStatus
 import com.github.backlog.model.database.entity.Game
-import com.github.backlog.ui.state.filter.FilterState
-import com.github.backlog.util.AppContainer
+import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.ui.components.*
+import com.github.backlog.ui.screen.ViewModelContainer
 import com.github.backlog.viewmodel.GameViewModel
 import java.time.LocalDate
 import java.util.*
 
-class LibraryScreen(private val onEditCardButtonClick: (Int) -> Unit,
-                    private val onOnlineSearchButtonClick: () -> Unit,
-                    private val onCreateButtonClick: () -> Unit,
-                    appContainer: AppContainer
-) : MainScreen(appContainer) {
+open class LibraryScreen(private val onEditCardButtonClick: (Int) -> Unit,
+                         private val onOnlineSearchButtonClick: () -> Unit,
+                         private val onCreateButtonClick: () -> Unit,
+                         viewModelContainer: ViewModelContainer
+) : MainScreen(viewModelContainer) {
 
     override val section: Section = Section.Library
 
     @Composable
     override fun Content(arguments: Bundle?) {
-        BacklogScreen(onEditCardClick = onEditCardButtonClick, gameViewModel = viewModelContainer.gameViewModel)
+        BacklogScreen(
+            onEditCardClick = onEditCardButtonClick,
+            gameViewModel = viewModelContainer.gameViewModel
+        )
     }
 
     @Composable
     override fun Fab() {
-        BacklogFab(onOnlineSearchButtonClick = onOnlineSearchButtonClick, onCreateButtonClick = onCreateButtonClick)
+        BacklogFab(
+            onOnlineSearchButtonClick = onOnlineSearchButtonClick,
+            onCreateButtonClick = onCreateButtonClick
+        )
     }
     
     @Composable
     override fun TopBarExtraButtons() {
-        BacklogTopBarExtraButtons(shouldShowFilters = viewModelContainer.gameViewModel.filterState.shouldShowFilters)
+        BacklogTopBarExtraButtons(onClick = {
+            viewModelContainer.gameViewModel.filterState.shouldShowFilters = true
+        })
     }
 }
 
@@ -149,12 +157,12 @@ fun BacklogFab(modifier: Modifier = Modifier, onOnlineSearchButtonClick: () -> U
 }
 
 @Composable
-private fun FilterDialog(state: FilterState) {
+private fun FilterDialog(state: GameFilterState) {
     Dialog(
-        onDismissRequest = { state.shouldShowFilters.value = false },
+        onDismissRequest = { state.shouldShowFilters = false },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ) {
-        Surface {
+        Surface(shape = LookAndFeel.DialogSurfaceShape) {
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -164,15 +172,15 @@ private fun FilterDialog(state: FilterState) {
             ) {
                 Text(text = stringResource(R.string.filters_heading), style = MaterialTheme.typography.h6)
                 Text(text = stringResource(R.string.insert_status_label), style = MaterialTheme.typography.subtitle1)
-                state.statusFilters.forEach {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = it.value,
-                            onCheckedChange = { newValue ->
-                                it.value = newValue
-                            }
-                        )
-                        Text(stringResource(it.nameResId))
+                Column() {
+                    state.statusFilters.forEach {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = it.value,
+                                onCheckedChange = { newValue -> it.value = newValue }
+                            )
+                            Text(stringResource(it.nameResId))
+                        }
                     }
                 }
             }
@@ -181,8 +189,8 @@ private fun FilterDialog(state: FilterState) {
 }
 
 @Composable
-fun BacklogTopBarExtraButtons(shouldShowFilters: MutableState<Boolean>) {
-    IconButton(onClick = { shouldShowFilters.value = true }) {
+fun BacklogTopBarExtraButtons(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
         Icon(imageVector = Icons.Default.FilterList, contentDescription = null)
     }
 }
@@ -227,7 +235,7 @@ fun BacklogScreen(onEditCardClick: (Int) -> Unit, gameViewModel: GameViewModel) 
             )
         }
     }
-    if (gameViewModel.filterState.shouldShowFilters.value) {
+    if (gameViewModel.filterState.shouldShowFilters) {
         FilterDialog(gameViewModel.filterState)
     }
 
@@ -235,7 +243,6 @@ fun BacklogScreen(onEditCardClick: (Int) -> Unit, gameViewModel: GameViewModel) 
         .collectAsState(initial = listOf()).value
         .filter { gameViewModel.filterState.testAll(it) }
         .apply {
-            println("ciaooo")
             if (this.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),

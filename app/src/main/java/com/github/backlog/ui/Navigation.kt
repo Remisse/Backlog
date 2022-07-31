@@ -1,8 +1,6 @@
 package com.github.backlog.ui
 
 import android.os.Bundle
-import androidx.compose.animation.AnimatedContentScope.SlideDirection.Companion.Left
-import androidx.compose.animation.AnimatedContentScope.SlideDirection.Companion.Right
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -36,7 +34,7 @@ fun NavigationRoot(appState: BacklogAppState) {
             modifier = Modifier.padding(it),
             contentAlignment = Alignment.TopCenter
         ) {
-            mainGraph(appState.main, appState.startingScreen)
+            mainGraph(appState)
 
             basicSecondaryGraph(appState.gameFormAdd)
             secondaryWithIntArgumentGraph(appState.gameFormEdit, "gameId")
@@ -48,16 +46,16 @@ fun NavigationRoot(appState: BacklogAppState) {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-private fun NavGraphBuilder.mainGraph(screens: List<BacklogScreen>, start: BacklogScreen) {
+private fun NavGraphBuilder.mainGraph(appState: BacklogAppState) {
     navigation(
         route = root,
-        startDestination = start.section.route
+        startDestination = appState.startingScreen.section.route
     ) {
-        screens.forEach { screen ->
+        appState.mainScreens.forEach { screen ->
             composable(
                 route = screen.section.route,
-                enterTransition = { slideIntoContainer(Right, tween()) },
-                exitTransition = { slideOutOfContainer(Left, tween()) }
+                enterTransition = { slideIntoContainer(appState.slideDirection(), tween()) },
+                exitTransition = { slideOutOfContainer(appState.slideDirection(), tween()) }
             ) {
                 screen.Content(null)
             }

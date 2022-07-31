@@ -23,18 +23,17 @@ import com.github.backlog.Section
 import com.github.backlog.model.GameStatus
 import com.github.backlog.model.TaskStatus
 import com.github.backlog.ui.screen.ViewModelContainer
-import com.github.backlog.util.AppContainer
 import com.github.backlog.ui.components.*
 import com.github.tehras.charts.piechart.PieChart
 import com.github.tehras.charts.piechart.PieChartData
 
-class ProfileScreen(appContainer: AppContainer) : MainScreen(appContainer) {
+class ProfileScreen(viewModelContainer: ViewModelContainer) : MainScreen(viewModelContainer) {
 
     override val section: Section = Section.Profile
 
     @Composable
     override fun Content(arguments: Bundle?) {
-        ProfileScreen(viewModelContainer)
+        ProfileScreenContent(viewModelContainer)
     }
 
     @Composable
@@ -111,7 +110,7 @@ fun PlaceholderText(text: String) {
 }
 
 @Composable
-fun ProfileScreen(viewModelContainer: ViewModelContainer) {
+fun ProfileScreenContent(viewModelContainer: ViewModelContainer) {
     val gameViewModel = viewModelContainer.gameViewModel
     val taskViewModel = viewModelContainer.taskViewModel
 

@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.github.backlog.model.database.BacklogDatabase
-import com.github.backlog.util.AppContainer
-import com.github.backlog.util.AppContainerImpl
+import com.github.backlog.util.ViewModelContainerAccessor
+import com.github.backlog.util.ViewModelContainerAccessorImpl
 
 class BacklogApplication : Application() {
 
@@ -15,8 +15,8 @@ class BacklogApplication : Application() {
             .fallbackToDestructiveMigration()
             .build()
     }
-    val appContainer: AppContainer by lazy {
-        AppContainerImpl(
+    val appContainer: ViewModelContainerAccessor by lazy {
+        ViewModelContainerAccessorImpl(
             database,
             WorkManager.getInstance(this)
         )

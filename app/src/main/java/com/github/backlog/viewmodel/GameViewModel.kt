@@ -4,17 +4,16 @@ import androidx.lifecycle.*
 import com.github.backlog.model.GameStatus
 import com.github.backlog.model.database.dao.GameDao
 import com.github.backlog.model.database.entity.Game
-import com.github.backlog.ui.state.filter.FilterState
+import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.ui.state.form.GameFormState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class GameViewModel(private val dao: GameDao) : ViewModel() {
 
     val formState = GameFormState()
-    val filterState = FilterState()
+    val filterState = GameFilterState()
 
     val backlog: Flow<List<Game>> = dao.backlog()
 

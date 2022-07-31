@@ -22,15 +22,14 @@ import com.github.backlog.Section
 import com.github.backlog.model.TaskStatus
 import com.github.backlog.model.database.entity.TaskWithGameTitle
 import com.github.backlog.ui.screen.ViewModelContainer
-import com.github.backlog.util.AppContainer
 import com.github.backlog.ui.components.*
 import java.time.LocalDate
 import java.util.*
 
 class TaskScreenContent(private val onTaskEditClick: (Int) -> Unit,
                         private val onCreateClick: () -> Unit,
-                        appContainer: AppContainer
-) : MainScreen(appContainer) {
+                        viewModelContainer: ViewModelContainer
+) : MainScreen(viewModelContainer) {
 
     override val section: Section = Section.Tasks
 

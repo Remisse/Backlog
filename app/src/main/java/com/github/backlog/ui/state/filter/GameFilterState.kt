@@ -1,14 +1,16 @@
 package com.github.backlog.ui.state.filter
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.example.backlog.R
 import com.github.backlog.model.GameStatus
 import com.github.backlog.model.database.entity.Game
 import com.github.backlog.ui.components.gameStatusToResource
 
 // TODO Refactor using Composite
-class FilterState {
-    var shouldShowFilters = mutableStateOf(false)
+class GameFilterState {
+    var shouldShowFilters by mutableStateOf(false)
 
     val statusFilters: List<BooleanFilter<Game>> = GameStatus.values().map {
         BooleanFilter(nameResId = gameStatusToResource(it), initialValue = true) { game, value ->
