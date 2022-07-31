@@ -5,19 +5,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.github.backlog.ui.theme.BacklogTheme
 import com.github.backlog.util.ViewModelContainerAccessor
-import com.github.backlog.ui.NavigationRoot
+import com.github.backlog.ui.navigation.NavigationRoot
+import com.github.backlog.ui.navigation.rememberNavigationState
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var appContainer: ViewModelContainerAccessor
+    private lateinit var accessor: ViewModelContainerAccessor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        appContainer = (application as BacklogApplication).appContainer
+        accessor = (application as BacklogApplication).appContainer
 
         setContent {
-            val appState = rememberBacklogAppState(appContainer = appContainer)
+            val appState = rememberNavigationState(appContainer = accessor)
 
             BacklogTheme {
                 NavigationRoot(appState)

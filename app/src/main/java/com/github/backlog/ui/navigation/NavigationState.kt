@@ -1,4 +1,4 @@
-package com.github.backlog
+package com.github.backlog.ui.navigation
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -9,6 +9,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
+import com.github.backlog.Section
 import com.github.backlog.ui.screen.BacklogScreen
 import com.github.backlog.ui.screen.content.main.LibraryScreen
 import com.github.backlog.ui.screen.content.main.ProfileScreen
@@ -20,47 +21,47 @@ import com.github.backlog.ui.screen.content.secondary.taskform.TaskFormEdit
 import com.github.backlog.util.ViewModelContainerAccessor
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
-class BacklogAppState(val scaffoldState: ScaffoldState,
+class NavigationState(val scaffoldState: ScaffoldState,
                       val navController: NavHostController,
-                      appContainer: ViewModelContainerAccessor
+                      accessor: ViewModelContainerAccessor
 ) {
     val mainScreens: List<BacklogScreen> = listOf(
         LibraryScreen(
             onEditCardButtonClick = { navController.navigate("${gameFormEdit.section.route}/${it}") },
             onOnlineSearchButtonClick = { /* TODO */},
             onCreateButtonClick = { navController.navigate(gameFormAdd.section.route) },
-            viewModelContainer = appContainer.getViewModelContainer()
+            viewModelContainer = accessor.getViewModelContainer()
         ),
         TaskScreenContent(
             onTaskEditClick = { navController.navigate("${taskFormEdit.section.route}/${it}") },
             onCreateClick = { navController.navigate(taskFormAdd.section.route) },
-            viewModelContainer = appContainer.getViewModelContainer()
+            viewModelContainer = accessor.getViewModelContainer()
         ),
-        ProfileScreen(viewModelContainer = appContainer.getViewModelContainer())
+        ProfileScreen(viewModelContainer = accessor.getViewModelContainer())
     )
 
     val gameFormAdd = GameFormAdd(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = appContainer.getViewModelContainer()
+        viewModelContainer = accessor.getViewModelContainer()
     )
 
     val gameFormEdit = GameFormEdit(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = appContainer.getViewModelContainer()
+        viewModelContainer = accessor.getViewModelContainer()
     )
 
     val taskFormAdd = TaskFormAdd(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = appContainer.getViewModelContainer()
+        viewModelContainer = accessor.getViewModelContainer()
     )
 
     val taskFormEdit = TaskFormEdit(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = appContainer.getViewModelContainer()
+        viewModelContainer = accessor.getViewModelContainer()
     )
 
     private val secondaryScreens: List<BacklogScreen> = listOf(
@@ -95,7 +96,7 @@ class BacklogAppState(val scaffoldState: ScaffoldState,
             _currentScreen.value = mainScreens.plus(secondaryScreens)
                 .find { baseRoute(it.section.route) == baseRoute(destination.route.orEmpty()) }!!
 
-            appContainer.clear()
+            accessor.clear()
         }
     }
 
@@ -120,11 +121,11 @@ class BacklogAppState(val scaffoldState: ScaffoldState,
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun rememberBacklogAppState(scaffoldState: ScaffoldState = rememberScaffoldState(),
+fun rememberNavigationState(scaffoldState: ScaffoldState = rememberScaffoldState(),
                             navController: NavHostController = rememberAnimatedNavController(),
                             appContainer: ViewModelContainerAccessor
-): BacklogAppState {
+): NavigationState {
     return remember(scaffoldState, navController, appContainer) {
-        BacklogAppState(scaffoldState, navController, appContainer)
+        NavigationState(scaffoldState, navController, appContainer)
     }
 }

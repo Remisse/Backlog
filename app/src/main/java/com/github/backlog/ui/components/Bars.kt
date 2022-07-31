@@ -49,8 +49,7 @@ fun TopMenuBar(@StringRes heading: Int, onMenuButtonClick: () -> Unit, modifier:
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.animateContentSize()
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onMenuButtonClick) {
                 Icon(imageVector = Icons.Default.Menu, contentDescription = "")
@@ -60,7 +59,6 @@ fun TopMenuBar(@StringRes heading: Int, onMenuButtonClick: () -> Unit, modifier:
         Row(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier.fillMaxWidth()
-                .animateContentSize()
         ) {
             extraButtons()
         }

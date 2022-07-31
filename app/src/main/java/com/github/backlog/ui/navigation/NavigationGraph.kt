@@ -1,7 +1,9 @@
-package com.github.backlog.ui
+package com.github.backlog.ui.navigation
 
 import android.os.Bundle
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -12,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.*
 import androidx.navigation.compose.navigation
-import com.github.backlog.BacklogAppState
 import com.github.backlog.ui.screen.BacklogScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -21,32 +22,36 @@ private const val root = "main"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun NavigationRoot(appState: BacklogAppState) {
+fun NavigationRoot(navState: NavigationState) {
     Scaffold(
-        scaffoldState = appState.scaffoldState,
-        topBar = { appState.currentScreen().TopBar() },
-        bottomBar = { appState.currentScreen().BottomBar(appState.navController, appState.bottomNavBarSections) },
-        floatingActionButton = { appState.currentScreen().Fab() }
+        scaffoldState = navState.scaffoldState,
+        topBar = { navState.currentScreen().TopBar() },
+        bottomBar = {
+            navState
+                .currentScreen()
+                .BottomBar(navState.navController, navState.bottomNavBarSections)
+        },
+        floatingActionButton = { navState.currentScreen().Fab() }
     ) {
         AnimatedNavHost(
-            navController = appState.navController,
+            navController = navState.navController,
             startDestination = root,
             modifier = Modifier.padding(it),
             contentAlignment = Alignment.TopCenter
         ) {
-            mainGraph(appState)
+            mainGraph(navState)
 
-            basicSecondaryGraph(appState.gameFormAdd)
-            secondaryWithIntArgumentGraph(appState.gameFormEdit, "gameId")
+            basicSecondaryGraph(navState.gameFormAdd)
+            secondaryWithIntArgumentGraph(navState.gameFormEdit, "gameId")
 
-            basicSecondaryGraph(appState.taskFormAdd)
-            secondaryWithIntArgumentGraph(appState.taskFormEdit, "taskId")
+            basicSecondaryGraph(navState.taskFormAdd)
+            secondaryWithIntArgumentGraph(navState.taskFormEdit, "taskId")
         }
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-private fun NavGraphBuilder.mainGraph(appState: BacklogAppState) {
+private fun NavGraphBuilder.mainGraph(appState: NavigationState) {
     navigation(
         route = root,
         startDestination = appState.startingScreen.section.route
@@ -54,8 +59,8 @@ private fun NavGraphBuilder.mainGraph(appState: BacklogAppState) {
         appState.mainScreens.forEach { screen ->
             composable(
                 route = screen.section.route,
-                enterTransition = { slideIntoContainer(appState.slideDirection(), tween()) },
-                exitTransition = { slideOutOfContainer(appState.slideDirection(), tween()) }
+                enterTransition = { slideIntoContainer(appState.slideDirection(), spring()) },
+                exitTransition = { slideOutOfContainer(appState.slideDirection(), spring()) }
             ) {
                 screen.Content(null)
             }
