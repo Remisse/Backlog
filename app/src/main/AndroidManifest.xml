@@ -4,7 +4,7 @@
     package="com.example.backlog">
 
     <application
-        android:name=".BacklogApplication"
+        android:name="com.github.backlog.BacklogApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Backlog"
         tools:targetApi="31">
-        <activity android:name=".MainActivity"
+        <activity android:name="com.github.backlog.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

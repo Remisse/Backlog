@@ -7,7 +7,7 @@
 
     <string name="insert_game_title">Title</string>
     <string name="insert_game_platform">Platform</string>
-    <string name="insert_topbar">Add game</string>
+    <string name="game_form_heading">Game details</string>
     <string name="insert_button_add">Add to backlog</string>
     <string name="insert_button_cancel">Cancel</string>
     <string name="insert_status_label">Status</string>
@@ -72,4 +72,6 @@
     <string name="tasks_empty">Your task list is empty.</string>
     <string name="required_fields_heading">Basic info (required)</string>
     <string name="optional_fields_heading">Other details</string>
+    <string name="form_error_toast">One or more fields contain invalid data.</string>
+    <string name="filters_heading">Filters</string>
 </resources>
