@@ -40,10 +40,4 @@ data class TaskFormState(
         gameId.value = entity.gameId
         deadline.value = entity.deadlineDateEpochDay?.let { LocalDate.ofEpochDay(it) }
     }
-
-    override fun validateAll(): List<String> {
-        return this::class.declaredMemberProperties.map { it.getter.call(this) }
-            .filterIsInstance<FormElement<*>>()
-            .flatMap { it.validate() }
-    }
 }

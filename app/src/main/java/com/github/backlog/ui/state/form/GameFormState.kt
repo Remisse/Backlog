@@ -52,11 +52,4 @@ data class GameFormState(
         publisher.value = entity.publisher.orEmpty()
         status.value = entity.status
     }
-
-    // TODO Extract abstract class
-    override fun validateAll(): List<String> {
-        return this::class.declaredMemberProperties.map { it.getter.call(this) }
-            .filterIsInstance<FormElement<*>>()
-            .flatMap { it.validate() }
-    }
 }
