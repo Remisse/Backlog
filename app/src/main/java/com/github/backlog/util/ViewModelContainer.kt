@@ -1,4 +1,4 @@
-package com.github.backlog.ui.screen
+package com.github.backlog.util
 
 import com.github.backlog.viewmodel.GameViewModel
 import com.github.backlog.viewmodel.TaskViewModel

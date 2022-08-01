@@ -7,12 +7,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.backlog.R
 import com.github.backlog.Section
-import com.github.backlog.ui.screen.ViewModelContainer
+import com.github.backlog.util.ViewModelContainer
 import com.github.backlog.viewmodel.GameViewModel
 
 class GameFormAdd(private val onDialogSubmitClick: () -> Unit,
                   private val onSuccess: () -> Unit,
-                  viewModelContainer: ViewModelContainer)
+                  viewModelContainer: ViewModelContainer
+)
 : BaseGameForm(viewModelContainer) {
 
     override val section: Section = Section.GameAdd

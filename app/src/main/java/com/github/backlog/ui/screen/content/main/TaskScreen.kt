@@ -21,7 +21,7 @@ import com.example.backlog.R
 import com.github.backlog.Section
 import com.github.backlog.model.TaskStatus
 import com.github.backlog.model.database.entity.TaskWithGameTitle
-import com.github.backlog.ui.screen.ViewModelContainer
+import com.github.backlog.util.ViewModelContainer
 import com.github.backlog.ui.components.*
 import java.time.LocalDate
 import java.util.*
@@ -62,9 +62,9 @@ private fun TaskList(list: List<TaskWithGameTitle>, modifier: Modifier = Modifie
                 exposedText = {
                     Column(horizontalAlignment = Alignment.Start) {
                         Text(
-                            text = stringResource(taskStatusToResource(item.task.status)).uppercase(),
+                            text = stringResource(item.task.status.toResource()).uppercase(),
                             style = MaterialTheme.typography.caption,
-                            color = taskStatusToColor(item.task.status)
+                            color = item.task.status.toColor()
                         )
                         Text(text = item.task.description, style = MaterialTheme.typography.subtitle2)
                         Spacer(modifier = Modifier.padding(vertical = 2.dp))
@@ -133,8 +133,8 @@ fun TaskScreen(onTaskEditClick: (Int) -> Unit, viewModelContainer: ViewModelCont
                     resetChangeState()
                 },
                 onDismissRequest = resetChangeState,
-                toColor = { taskStatusToColor(it) },
-                toResource = { taskStatusToResource(it) }
+                toColor = { it.toColor() },
+                toResource = { it.toResource() }
             )
         }
     }

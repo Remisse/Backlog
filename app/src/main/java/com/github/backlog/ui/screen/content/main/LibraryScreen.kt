@@ -29,7 +29,7 @@ import com.github.backlog.model.GameStatus
 import com.github.backlog.model.database.entity.Game
 import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.ui.components.*
-import com.github.backlog.ui.screen.ViewModelContainer
+import com.github.backlog.util.ViewModelContainer
 import com.github.backlog.viewmodel.GameViewModel
 import java.time.LocalDate
 import java.util.*
@@ -81,8 +81,8 @@ private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDelete
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = stringResource(gameStatusToResource(game.status)).uppercase(),
-                            color = gameStatusToColor(game.status),
+                            text = stringResource(game.status.toResource()).uppercase(),
+                            color = game.status.toColor(),
                             style = MaterialTheme.typography.caption
                         )
                         Text(
@@ -230,8 +230,8 @@ fun BacklogScreen(onEditCardClick: (Int) -> Unit, gameViewModel: GameViewModel) 
                     resetChangeState()
                 },
                 onDismissRequest = resetChangeState,
-                toColor = { gameStatusToColor(it) },
-                toResource = { gameStatusToResource(it) }
+                toColor = { it.toColor() },
+                toResource = { it.toResource() }
             )
         }
     }

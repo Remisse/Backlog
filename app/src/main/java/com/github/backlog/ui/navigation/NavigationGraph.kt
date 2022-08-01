@@ -36,8 +36,7 @@ fun NavigationRoot(navState: NavigationState) {
         AnimatedNavHost(
             navController = navState.navController,
             startDestination = root,
-            modifier = Modifier.padding(it),
-            contentAlignment = Alignment.TopCenter
+            modifier = Modifier.padding(it)
         ) {
             mainGraph(navState)
 

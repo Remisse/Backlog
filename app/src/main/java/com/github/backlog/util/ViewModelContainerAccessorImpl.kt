@@ -2,7 +2,6 @@ package com.github.backlog.util
 
 import androidx.work.WorkManager
 import com.github.backlog.model.database.BacklogDatabase
-import com.github.backlog.ui.screen.ViewModelContainer
 import com.github.backlog.viewmodel.GameViewModel
 import com.github.backlog.viewmodel.GameViewModelFactory
 import com.github.backlog.viewmodel.TaskViewModel
@@ -23,21 +22,12 @@ class ViewModelContainerAccessorImpl(database: BacklogDatabase,
     private fun createGameViewModel() = gameViewModelFactory.create(GameViewModel::class.java)
     private fun createTaskViewModel() = taskViewModelFactory.create(TaskViewModel::class.java)
 
-    private var _viewModelContainer: ViewModelContainer
+    private fun initContainer(): ViewModelContainer = ViewModelContainer(createGameViewModel(), createTaskViewModel())
 
-    override fun getViewModelContainer(): ViewModelContainer = _viewModelContainer
-
-    init {
-        _viewModelContainer = ViewModelContainer(
-            gameViewModel = createGameViewModel(),
-            taskViewModel = createTaskViewModel()
-        )
-    }
+    override var viewModelContainer: ViewModelContainer = initContainer()
+        private set
 
     override fun clear() {
-        _viewModelContainer = ViewModelContainer(
-            gameViewModel = createGameViewModel(),
-            taskViewModel = createTaskViewModel()
-        )
+        viewModelContainer = initContainer()
     }
 }

@@ -74,4 +74,5 @@
     <string name="optional_fields_heading">Other details</string>
     <string name="form_error_toast">One or more fields contain invalid data.</string>
     <string name="filters_heading">Filters</string>
+    <string name="searchbar_text">Search</string>
 </resources>

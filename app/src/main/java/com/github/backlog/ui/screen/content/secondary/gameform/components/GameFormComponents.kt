@@ -41,7 +41,7 @@ private fun FieldStatusMenu(value: GameStatus, onSelect: (GameStatus) -> Unit) {
     ) {
         TextField(
             label = { Text(text = stringResource(R.string.insert_status_label)) },
-            value = stringResource(gameStatusToResource(value)),
+            value = stringResource(value.toResource()),
             onValueChange = { },
             trailingIcon = {
                 IconButton(onClick = { isExpanded = true }) {
@@ -63,8 +63,8 @@ private fun FieldStatusMenu(value: GameStatus, onSelect: (GameStatus) -> Unit) {
                 onSelect(it)
             },
             onDismissRequest = { isExpanded = false },
-            toColor = { gameStatusToColor(it) },
-            toResource = { gameStatusToResource(it) }
+            toColor = { it.toColor() },
+            toResource = { it.toResource() }
         )
     }
 }

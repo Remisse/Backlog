@@ -3,10 +3,10 @@ package com.github.backlog
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.github.backlog.ui.theme.BacklogTheme
-import com.github.backlog.util.ViewModelContainerAccessor
 import com.github.backlog.ui.navigation.NavigationRoot
 import com.github.backlog.ui.navigation.rememberNavigationState
+import com.github.backlog.ui.theme.BacklogTheme
+import com.github.backlog.util.ViewModelContainerAccessor
 
 class MainActivity : ComponentActivity() {
 

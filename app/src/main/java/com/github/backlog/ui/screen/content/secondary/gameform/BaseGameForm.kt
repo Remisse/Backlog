@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import com.github.backlog.Section
 import com.github.backlog.ui.components.SubScreenTopBar
 import com.github.backlog.ui.screen.BaseScreen
-import com.github.backlog.ui.screen.ViewModelContainer
+import com.github.backlog.util.ViewModelContainer
 
 abstract class BaseGameForm(viewModelContainer: ViewModelContainer) : BaseScreen(viewModelContainer) {
 

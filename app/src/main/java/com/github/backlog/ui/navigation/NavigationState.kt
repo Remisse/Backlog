@@ -30,38 +30,38 @@ class NavigationState(val scaffoldState: ScaffoldState,
             onEditCardButtonClick = { navController.navigate("${gameFormEdit.section.route}/${it}") },
             onOnlineSearchButtonClick = { /* TODO */},
             onCreateButtonClick = { navController.navigate(gameFormAdd.section.route) },
-            viewModelContainer = accessor.getViewModelContainer()
+            viewModelContainer = accessor.viewModelContainer
         ),
         TaskScreenContent(
             onTaskEditClick = { navController.navigate("${taskFormEdit.section.route}/${it}") },
             onCreateClick = { navController.navigate(taskFormAdd.section.route) },
-            viewModelContainer = accessor.getViewModelContainer()
+            viewModelContainer = accessor.viewModelContainer
         ),
-        ProfileScreen(viewModelContainer = accessor.getViewModelContainer())
+        ProfileScreen(viewModelContainer = accessor.viewModelContainer)
     )
 
     val gameFormAdd = GameFormAdd(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = accessor.getViewModelContainer()
+        viewModelContainer = accessor.viewModelContainer
     )
 
     val gameFormEdit = GameFormEdit(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = accessor.getViewModelContainer()
+        viewModelContainer = accessor.viewModelContainer
     )
 
     val taskFormAdd = TaskFormAdd(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = accessor.getViewModelContainer()
+        viewModelContainer = accessor.viewModelContainer
     )
 
     val taskFormEdit = TaskFormEdit(
         onSuccess = { navController.navigateUp() },
         onDialogSubmitClick = { navController.navigateUp() },
-        viewModelContainer = accessor.getViewModelContainer()
+        viewModelContainer = accessor.viewModelContainer
     )
 
     private val secondaryScreens: List<BacklogScreen> = listOf(
@@ -90,7 +90,7 @@ class NavigationState(val scaffoldState: ScaffoldState,
     init {
         _currentScreen.value = startingScreen
 
-        // When navigating to a new screen, reset the
+        // When navigating to a new screen, reinitialize all ViewModels.
         navController.addOnDestinationChangedListener { _, destination, _ ->
             _from.value = _currentScreen.value
             _currentScreen.value = mainScreens.plus(secondaryScreens)

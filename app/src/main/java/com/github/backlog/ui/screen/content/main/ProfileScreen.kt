@@ -22,7 +22,7 @@ import com.example.backlog.R
 import com.github.backlog.Section
 import com.github.backlog.model.GameStatus
 import com.github.backlog.model.TaskStatus
-import com.github.backlog.ui.screen.ViewModelContainer
+import com.github.backlog.util.ViewModelContainer
 import com.github.backlog.ui.components.*
 import com.github.tehras.charts.piechart.PieChart
 import com.github.tehras.charts.piechart.PieChartData
@@ -136,7 +136,7 @@ fun ProfileScreenContent(viewModelContainer: ViewModelContainer) {
             PlaceholderText(stringResource(R.string.profile_no_data))
         } else {
             val counts: Map<GameStatus, Int> = countOccurrences(backlog.map { it.status })
-            StatusPie(counts, { gameStatusToColor(it) }, { gameStatusToResource(it) })
+            StatusPie(counts, { it.toColor() }, { it.toResource() })
         }
         Spacer(modifier = Modifier.padding(vertical = 4.dp))
         SectionTitleText(text = stringResource(R.string.profile_tasks_subheading))
@@ -144,7 +144,7 @@ fun ProfileScreenContent(viewModelContainer: ViewModelContainer) {
             PlaceholderText(text = stringResource(R.string.profile_tasks_no_data))
         } else {
             val counts: Map<TaskStatus, Int> = countOccurrences(tasks.map { it.task.status })
-            StatusPie(counts, { taskStatusToColor(it) }, { taskStatusToResource(it) })
+            StatusPie(counts, { it.toColor() }, { it.toResource() })
         }
     }
 }

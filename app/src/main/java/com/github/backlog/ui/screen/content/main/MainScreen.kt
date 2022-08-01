@@ -7,7 +7,7 @@ import com.github.backlog.Section
 import com.github.backlog.ui.components.BottomNavigationBar
 import com.github.backlog.ui.components.TopMenuBar
 import com.github.backlog.ui.screen.BaseScreen
-import com.github.backlog.ui.screen.ViewModelContainer
+import com.github.backlog.util.ViewModelContainer
 
 abstract class MainScreen(viewModelContainer: ViewModelContainer) : BaseScreen(viewModelContainer) {
 
