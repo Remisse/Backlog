@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BacklogTheme {
-                NavigationRoot(rememberNavigationState(appContainer = accessor))
+                NavigationRoot(rememberNavigationState(accessor = accessor))
             }
         }
     }

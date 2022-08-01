@@ -123,9 +123,9 @@ class NavigationState(val scaffoldState: ScaffoldState,
 @Composable
 fun rememberNavigationState(scaffoldState: ScaffoldState = rememberScaffoldState(),
                             navController: NavHostController = rememberAnimatedNavController(),
-                            appContainer: ViewModelContainerAccessor
+                            accessor: ViewModelContainerAccessor
 ): NavigationState {
-    return remember(scaffoldState, navController, appContainer) {
-        NavigationState(scaffoldState, navController, appContainer)
+    return remember(scaffoldState, navController, accessor) {
+        NavigationState(scaffoldState, navController, accessor)
     }
 }
