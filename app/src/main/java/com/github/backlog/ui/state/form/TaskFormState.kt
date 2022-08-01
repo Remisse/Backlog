@@ -4,11 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.github.backlog.model.TaskStatus
-import com.github.backlog.model.database.entity.Task
+import com.github.backlog.model.database.backlog.entity.Task
 import com.github.backlog.ui.state.form.validator.Required
 import java.lang.IllegalStateException
 import java.time.LocalDate
-import kotlin.reflect.full.declaredMemberProperties
 
 data class TaskFormState(
     var uid: Int = 0,

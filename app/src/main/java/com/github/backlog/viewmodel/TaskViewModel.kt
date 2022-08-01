@@ -4,9 +4,9 @@ import androidx.lifecycle.*
 import androidx.work.*
 import com.github.backlog.model.DeadlineWorker
 import com.github.backlog.model.TaskStatus
-import com.github.backlog.model.database.dao.TaskDao
-import com.github.backlog.model.database.entity.Task
-import com.github.backlog.model.database.entity.TaskWithGameTitle
+import com.github.backlog.model.database.backlog.dao.TaskDao
+import com.github.backlog.model.database.backlog.entity.Task
+import com.github.backlog.model.database.backlog.entity.TaskWithGameTitle
 import com.github.backlog.ui.state.form.TaskFormState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

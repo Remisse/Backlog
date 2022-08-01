@@ -1,6 +1,10 @@
 package com.github.backlog.model.network.adapter
 
+import com.github.backlog.model.GameStatus
+import com.github.backlog.model.database.backlog.entity.Game
 import com.squareup.moshi.JsonClass
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @JsonClass(generateAdapter = true)
 data class RawgPlatform(
@@ -54,3 +58,21 @@ data class RawgGame(
 
 @JsonClass(generateAdapter = true)
 data class RawgList(val games: List<RawgGame>)
+
+fun RawgList.asDomainModel(): List<Game> {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-mm-dd")
+
+    return games.map {
+        Game(
+            title = it.name,
+            // TODO Allow the user to choose the platform
+            platform = it.platforms.platform.getOrNull(0)?.name.orEmpty(),
+            status = GameStatus.NOT_STARTED,
+            developer = "",
+            publisher = "",
+            genre = "",
+            releaseDate = LocalDate.parse(it.released, formatter).toEpochDay(),
+            coverPath = null
+        )
+    }
+}

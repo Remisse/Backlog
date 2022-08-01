@@ -1,4 +1,4 @@
-package com.github.backlog.model.database
+package com.github.backlog.model.database.backlog
 
 import androidx.room.TypeConverter
 import com.github.backlog.model.GameStatus

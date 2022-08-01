@@ -2,8 +2,8 @@ package com.github.backlog.viewmodel
 
 import androidx.lifecycle.*
 import com.github.backlog.model.GameStatus
-import com.github.backlog.model.database.dao.GameDao
-import com.github.backlog.model.database.entity.Game
+import com.github.backlog.model.database.backlog.dao.GameDao
+import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.ui.state.form.GameFormState
 import kotlinx.coroutines.Job

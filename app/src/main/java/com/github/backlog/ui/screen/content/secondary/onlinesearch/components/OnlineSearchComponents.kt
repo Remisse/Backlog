@@ -1,4 +1,4 @@
-package com.github.backlog.ui
+package com.github.backlog.ui.screen.content.secondary.onlinesearch.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
-import com.github.backlog.model.database.entity.Game
+import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.components.LookAndFeel
 import com.github.backlog.ui.components.SearchBar
 import com.github.backlog.viewmodel.GameViewModel

@@ -15,13 +15,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        accessor = (application as BacklogApplication).appContainer
+        accessor = (application as BacklogApplication).viewModelContainerAccessor
 
         setContent {
-            val appState = rememberNavigationState(appContainer = accessor)
-
             BacklogTheme {
-                NavigationRoot(appState)
+                NavigationRoot(rememberNavigationState(appContainer = accessor))
             }
         }
     }

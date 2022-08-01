@@ -9,5 +9,5 @@ class OnlineSearchClient(url: String) {
                     .addConverterFactory(MoshiConverterFactory.create())
                     .build()
 
-    val service = retrofit.create(OnlineSearchService::class.java)
+    val service: OnlineSearchService = retrofit.create(OnlineSearchService::class.java)
 }

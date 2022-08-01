@@ -1,6 +1,5 @@
 package com.github.backlog.ui.screen.content.secondary.taskform.components
 
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,18 +12,15 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.backlog.R
-import com.github.backlog.model.database.entity.Game
+import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.components.*
 import com.github.backlog.ui.interop.CalendarDialog
 import com.github.backlog.viewmodel.GameViewModel
-import com.github.backlog.viewmodel.TaskViewModel
 import com.github.backlog.ui.state.form.TaskFormState
 import java.time.LocalDate
 import java.util.*

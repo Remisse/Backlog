@@ -1,12 +1,12 @@
-package com.github.backlog.model.database
+package com.github.backlog.model.database.backlog
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.github.backlog.model.database.dao.GameDao
-import com.github.backlog.model.database.dao.TaskDao
-import com.github.backlog.model.database.entity.Game
-import com.github.backlog.model.database.entity.Task
+import com.github.backlog.model.database.backlog.dao.GameDao
+import com.github.backlog.model.database.backlog.dao.TaskDao
+import com.github.backlog.model.database.backlog.entity.Game
+import com.github.backlog.model.database.backlog.entity.Task
 
 @Database(
     entities = [Game::class, Task::class],

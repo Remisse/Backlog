@@ -1,9 +1,9 @@
-package com.github.backlog.model.database.dao
+package com.github.backlog.model.database.backlog.dao
 
 import androidx.room.*
 import com.github.backlog.model.TaskStatus
-import com.github.backlog.model.database.entity.Task
-import com.github.backlog.model.database.entity.TaskWithGameTitle
+import com.github.backlog.model.database.backlog.entity.Task
+import com.github.backlog.model.database.backlog.entity.TaskWithGameTitle
 import kotlinx.coroutines.flow.Flow
 
 @Dao

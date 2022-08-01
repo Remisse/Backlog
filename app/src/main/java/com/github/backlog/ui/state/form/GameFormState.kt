@@ -1,17 +1,12 @@
 package com.github.backlog.ui.state.form
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.backlog.R
 import com.github.backlog.model.GameStatus
-import com.github.backlog.model.database.entity.Game
+import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.state.form.validator.Required
-import com.github.backlog.viewmodel.GameViewModel
 import java.time.LocalDate
-import kotlin.properties.Delegates
-import kotlin.reflect.full.declaredMemberProperties
 
 data class GameFormState(
     var uid: Int = 0,

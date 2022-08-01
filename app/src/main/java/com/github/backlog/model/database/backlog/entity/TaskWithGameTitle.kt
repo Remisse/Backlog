@@ -1,4 +1,4 @@
-package com.github.backlog.model.database.entity
+package com.github.backlog.model.database.backlog.entity
 
 import androidx.room.Embedded
 

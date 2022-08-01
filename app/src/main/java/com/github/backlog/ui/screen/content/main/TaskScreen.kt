@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.backlog.R
 import com.github.backlog.Section
 import com.github.backlog.model.TaskStatus
-import com.github.backlog.model.database.entity.TaskWithGameTitle
+import com.github.backlog.model.database.backlog.entity.TaskWithGameTitle
 import com.github.backlog.util.ViewModelContainer
 import com.github.backlog.ui.components.*
 import java.time.LocalDate

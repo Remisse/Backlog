@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.backlog.R
 import com.github.backlog.model.GameStatus
-import com.github.backlog.model.database.entity.Game
+import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.components.toResource
 
 // TODO Refactor using Composite

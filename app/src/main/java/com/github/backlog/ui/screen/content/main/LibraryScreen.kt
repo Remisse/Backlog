@@ -26,7 +26,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.backlog.R
 import com.github.backlog.Section
 import com.github.backlog.model.GameStatus
-import com.github.backlog.model.database.entity.Game
+import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.ui.components.*
 import com.github.backlog.util.ViewModelContainer
