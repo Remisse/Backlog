@@ -1,7 +1,6 @@
 package com.github.backlog.ui.components
 
 import androidx.annotation.StringRes
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -32,7 +31,7 @@ fun SearchBar(value: String, onValueChange: (String) -> Unit, modifier: Modifier
         label = {
             Row() {
                 Icon(imageVector = Icons.Default.Search, contentDescription = null)
-                Text("Search")
+                Text(stringResource(R.string.searchbar_text))
             }
         },
         shape = shape
