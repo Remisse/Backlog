@@ -2,9 +2,7 @@ package com.github.backlog.ui.navigation
 
 import android.os.Bundle
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
@@ -31,20 +29,21 @@ fun NavigationRoot(navState: NavigationState) {
                 .currentScreen()
                 .BottomBar(navState.navController, navState.bottomNavBarSections)
         },
-        floatingActionButton = { navState.currentScreen().Fab() }
+        floatingActionButton = { navState.currentScreen().Fab() },
     ) {
         AnimatedNavHost(
             navController = navState.navController,
             startDestination = root,
-            modifier = Modifier.padding(it)
+            modifier = Modifier.padding(it),
+            contentAlignment = Alignment.TopCenter
         ) {
             mainGraph(navState)
 
             basicSecondaryGraph(navState.gameFormAdd)
-            secondaryWithIntArgumentGraph(navState.gameFormEdit, "gameId")
+            secondaryWithNonNullArgumentGraph(navState.gameFormEdit, "gameId", NavType.IntType)
 
             basicSecondaryGraph(navState.taskFormAdd)
-            secondaryWithIntArgumentGraph(navState.taskFormEdit, "taskId")
+            secondaryWithNonNullArgumentGraph(navState.taskFormEdit, "taskId", NavType.IntType)
         }
     }
 }
@@ -79,16 +78,16 @@ private fun NavGraphBuilder.basicSecondaryGraph(screen: BacklogScreen) {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-private fun NavGraphBuilder.secondaryWithIntArgumentGraph(screen: BacklogScreen, argKey: String) {
+private fun NavGraphBuilder.secondaryWithNonNullArgumentGraph(screen: BacklogScreen,
+                                                              argKey: String,
+                                                              argType: NavType<*>
+) {
     composable(
         route = "${screen.section.route}/{$argKey}",
-        arguments = listOf(navArgument(argKey) { type = NavType.IntType }),
+        arguments = listOf(navArgument(argKey) { type = argType }),
         enterTransition = { slideInVertically { it } },
         exitTransition = { slideOutVertically { -it } }
     ) { from ->
-        val args = Bundle()
-        from.arguments?.getInt(argKey)
-            ?.let { args.putInt(argKey, it) }
-        screen.Content(args)
+        screen.Content(Bundle(from.arguments))
     }
 }

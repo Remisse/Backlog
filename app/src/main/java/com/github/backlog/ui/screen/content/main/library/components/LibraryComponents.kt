@@ -1,6 +1,5 @@
-package com.github.backlog.ui.screen.content.main
+package com.github.backlog.ui.screen.content.main.library.components
 
-import android.os.Bundle
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,47 +23,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.backlog.R
-import com.github.backlog.Section
 import com.github.backlog.model.GameStatus
 import com.github.backlog.model.database.backlog.entity.Game
-import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.ui.components.*
-import com.github.backlog.util.ViewModelContainer
+import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.viewmodel.GameViewModel
 import java.time.LocalDate
 import java.util.*
-
-open class LibraryScreen(private val onEditCardButtonClick: (Int) -> Unit,
-                         private val onOnlineSearchButtonClick: () -> Unit,
-                         private val onCreateButtonClick: () -> Unit,
-                         viewModelContainer: ViewModelContainer
-) : MainScreen(viewModelContainer) {
-
-    override val section: Section = Section.Library
-
-    @Composable
-    override fun Content(arguments: Bundle?) {
-        BacklogScreen(
-            onEditCardClick = onEditCardButtonClick,
-            gameViewModel = viewModelContainer.gameViewModel
-        )
-    }
-
-    @Composable
-    override fun Fab() {
-        BacklogFab(
-            onOnlineSearchButtonClick = onOnlineSearchButtonClick,
-            onCreateButtonClick = onCreateButtonClick
-        )
-    }
-    
-    @Composable
-    override fun TopBarExtraButtons() {
-        BacklogTopBarExtraButtons(onClick = {
-            viewModelContainer.gameViewModel.filterState.shouldShowFilters = true
-        })
-    }
-}
 
 @Composable
 private fun ItemCardList(games: List<Game>, onEditClick: (Int) -> Unit, onDeleteClick: (Game) -> Unit,

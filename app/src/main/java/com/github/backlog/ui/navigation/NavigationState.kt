@@ -11,9 +11,9 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.github.backlog.Section
 import com.github.backlog.ui.screen.BacklogScreen
-import com.github.backlog.ui.screen.content.main.LibraryScreen
 import com.github.backlog.ui.screen.content.main.ProfileScreen
 import com.github.backlog.ui.screen.content.main.TaskScreenContent
+import com.github.backlog.ui.screen.content.main.library.LibraryScreen
 import com.github.backlog.ui.screen.content.secondary.gameform.GameFormAdd
 import com.github.backlog.ui.screen.content.secondary.gameform.GameFormEdit
 import com.github.backlog.ui.screen.content.secondary.taskform.TaskFormAdd
@@ -72,7 +72,7 @@ class NavigationState(val scaffoldState: ScaffoldState,
     )
 
     /**
-     * Returns the route name stripped of all arguments, if any.
+     * Returns the route name stripped of all arguments, if there are any.
      */
     private fun baseRoute(route: String): String {
         return route.split("?", "/")[0]

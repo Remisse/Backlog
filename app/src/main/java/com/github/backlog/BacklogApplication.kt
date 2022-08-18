@@ -3,14 +3,11 @@ package com.github.backlog
 import android.app.Application
 import androidx.room.Room
 import androidx.work.WorkManager
-import com.example.backlog.R
 import com.github.backlog.model.database.backlog.BacklogDatabase
 import com.github.backlog.model.database.searchcache.SearchCacheDatabase
 import com.github.backlog.model.network.OnlineSearchClient
-import com.github.backlog.model.network.OnlineSearchService
 import com.github.backlog.util.ViewModelContainerAccessor
 import com.github.backlog.util.ViewModelContainerAccessorImpl
-import com.github.backlog.util.readRaw
 
 class BacklogApplication : Application() {
 
@@ -27,8 +24,8 @@ class BacklogApplication : Application() {
             .build()
     }
 
-    private val onlineSearchClient = OnlineSearchClient(readRaw(R.raw.url))
-    private val onlineSearchService: OnlineSearchService = onlineSearchClient.service
+    private val onlineSearchClient = OnlineSearchClient()
+    private val onlineSearchService = onlineSearchClient.service
 
     val viewModelContainerAccessor: ViewModelContainerAccessor by lazy {
         ViewModelContainerAccessorImpl(
