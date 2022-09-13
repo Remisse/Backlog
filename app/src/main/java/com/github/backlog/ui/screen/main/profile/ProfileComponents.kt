@@ -366,6 +366,14 @@ private fun ProfilePart(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val isDarkTheme = isSystemInDarkTheme()
+    val placeholderImage = remember(isDarkTheme) {
+        mutableStateOf(
+            if (isDarkTheme) R.drawable.ic_placeholder_image_white
+            else R.drawable.ic_placeholder_image
+        )
+    }
+
     var name: String? by remember { mutableStateOf(null) }
     var bio: String? by remember { mutableStateOf(null) }
     var imageUri: Uri? by remember { mutableStateOf(null) }
@@ -428,7 +436,7 @@ private fun ProfilePart(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val bitmap = imageUri?.toBitmap(context)
-            ?: AppCompatResources.getDrawable(context, R.drawable.ic_placeholder_image)!!
+            ?: AppCompatResources.getDrawable(context, placeholderImage.value)!!
                 .toBitmap()
         Image(
             bitmap = bitmap.asImageBitmap(),

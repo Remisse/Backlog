@@ -142,7 +142,7 @@ fun SubScreenTopBar(@StringRes heading: Int, onBackClick: () -> Unit) {
 @Composable
 fun BottomNavigationBar(navController: NavHostController, sections: List<Section>) {
     BottomAppBar(
-        backgroundColor = if (isSystemInDarkTheme()) Color.Transparent else lightColors().primary
+        backgroundColor = if (isSystemInDarkTheme()) Color.Transparent else MaterialTheme.colors.primary
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
