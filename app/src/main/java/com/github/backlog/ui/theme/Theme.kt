@@ -5,19 +5,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+/* Color palettes */
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
-)
-
-// TODO
-private val AmoledColorPalette = darkColors(
-    primary = Color.Black,
-    primaryVariant = Color.DarkGray,
-    secondary = Color.Yellow
+    primary = Teal1,
+    primaryVariant = Blue1,
+    secondary = LightGreen
 )
 
 private val LightColorPalette = lightColors(
@@ -36,7 +32,10 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun BacklogTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun BacklogTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
@@ -49,4 +48,11 @@ fun BacklogTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
         shapes = Shapes,
         content = content
     )
+
+    val systemUiController = rememberSystemUiController()
+    val backgroundColor = if (darkTheme) DarkColorPalette.background else LightColorPalette.primary
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(backgroundColor, darkIcons = !darkTheme)
+    }
 }

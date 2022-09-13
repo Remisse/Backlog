@@ -6,44 +6,64 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.*
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import com.github.backlog.ui.screen.BacklogScreen
+import com.github.backlog.ui.components.MainDrawer
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 
-private const val root = "main"
+private const val ROOT = "main"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavigationRoot(navState: NavigationState) {
     Scaffold(
+        drawerBackgroundColor = MaterialTheme.colors.surface,
+        drawerContentColor = MaterialTheme.colors.onSurface,
+        drawerScrimColor = MaterialTheme.colors.background,
+        drawerContent = { MainDrawer() },
         scaffoldState = navState.scaffoldState,
-        topBar = { navState.currentScreen().TopBar() },
+        topBar = {
+            navState.currentScreen()
+                .TopBar()
+        },
         bottomBar = {
-            navState
-                .currentScreen()
+            navState.currentScreen()
                 .BottomBar(navState.navController, navState.bottomNavBarSections)
         },
-        floatingActionButton = { navState.currentScreen().Fab() },
-    ) {
+        floatingActionButton = {
+            navState.currentScreen()
+                .Fab()
+        },
+    ) { padding ->
         AnimatedNavHost(
             navController = navState.navController,
-            startDestination = root,
-            modifier = Modifier.padding(it),
-            contentAlignment = Alignment.TopCenter
+            startDestination = ROOT,
+            modifier = Modifier.padding(padding),
+            contentAlignment = Alignment.TopCenter // Removing this will make animations look weird
         ) {
             mainGraph(navState)
 
-            basicSecondaryGraph(navState.gameFormAdd)
-            secondaryWithNonNullArgumentGraph(navState.gameFormEdit, "gameId", NavType.IntType)
+            navState.secondaryScreens.forEach {
+                basicSecondaryGraph(it)
+            }
 
-            basicSecondaryGraph(navState.taskFormAdd)
-            secondaryWithNonNullArgumentGraph(navState.taskFormEdit, "taskId", NavType.IntType)
+            navState.secondaryWithArgument.forEach { (screen, pair) ->
+                secondaryWithNonNullArgumentGraph(screen, pair.first, pair.second)
+            }
+
+            navState.dialogs.forEach { screen ->
+                dialog(screen.section.route) {
+                    screen.Content(null)
+                }
+            }
         }
     }
 }
@@ -51,7 +71,7 @@ fun NavigationRoot(navState: NavigationState) {
 @OptIn(ExperimentalAnimationApi::class)
 private fun NavGraphBuilder.mainGraph(appState: NavigationState) {
     navigation(
-        route = root,
+        route = ROOT,
         startDestination = appState.startingScreen.section.route
     ) {
         appState.mainScreens.forEach { screen ->
@@ -78,9 +98,10 @@ private fun NavGraphBuilder.basicSecondaryGraph(screen: BacklogScreen) {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-private fun NavGraphBuilder.secondaryWithNonNullArgumentGraph(screen: BacklogScreen,
-                                                              argKey: String,
-                                                              argType: NavType<*>
+private fun NavGraphBuilder.secondaryWithNonNullArgumentGraph(
+    screen: BacklogScreen,
+    argKey: String,
+    argType: NavType<*>
 ) {
     composable(
         route = "${screen.section.route}/{$argKey}",

@@ -1,12 +1,15 @@
 package com.github.backlog
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.github.backlog.ui.navigation.NavigationRoot
 import com.github.backlog.ui.navigation.rememberNavigationState
 import com.github.backlog.ui.theme.BacklogTheme
-import com.github.backlog.util.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelContainerAccessor
 
 class MainActivity : ComponentActivity() {
 
@@ -15,10 +18,22 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Create the NotificationChannel
+        val name = "task channel"
+        val descriptionText = ""
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+            description = descriptionText
+        }
+        // Register the channel with the system
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+
         accessor = (application as BacklogApplication).viewModelContainerAccessor
 
         setContent {
-            BacklogTheme {
+            BacklogTheme() {
                 NavigationRoot(rememberNavigationState(accessor = accessor))
             }
         }

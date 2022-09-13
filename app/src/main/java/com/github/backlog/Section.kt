@@ -4,9 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.backlog.R
 
-// TODO Need to refactor this
 sealed class Section(val route: String, @StringRes val resourceId: Int, val icon: ImageVector) {
 
     // Main
@@ -20,4 +18,10 @@ sealed class Section(val route: String, @StringRes val resourceId: Int, val icon
 
     object TaskAdd : Section("task_add", R.string.task_fab_add, Icons.Default.Add)
     object TaskEdit : Section("task_edit", R.string.task_update_heading, Icons.Default.EditNote)
+    
+    object OnlineSearch : Section("online_search", R.string.online_search_title, Icons.Default.Web)
+    object OnlineImport : Section("online_import", R.string.import_game_heading, Icons.Default.Edit)
+    
+    object SteamImportPrep : Section("steam_import_prep", R.string.steam_import_prep_heading, Icons.Default.Edit)
+    object SteamImport : Section("steam_import", R.string.steam_import_heading, Icons.Default.List)
 }

@@ -2,19 +2,20 @@ package com.github.backlog.ui.interop
 
 import android.widget.DatePicker
 import android.widget.TimePicker
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.backlog.R
+import com.github.backlog.R
+import com.github.backlog.ui.theme.Blue1
+import com.github.backlog.ui.theme.YellowTetrad1
 
 @Composable
 private fun CustomDateTimeDialog(onDismissRequest: () -> Unit, content: @Composable () -> Unit) {
@@ -37,7 +38,11 @@ fun Calendar(listener: DatePicker.OnDateChangedListener) {
 }
 
 @Composable
-fun CalendarDialog(enabled: Boolean, onDismissRequest: () -> Unit, onConfirmClick: (Int, Int, Int) -> Unit) {
+fun CalendarDialog(
+    enabled: Boolean,
+    onDismissRequest: () -> Unit,
+    onConfirmClick: (Int?, Int?, Int?) -> Unit
+) {
     if (enabled) {
         val year: MutableState<Int?> = remember { mutableStateOf(null) }
         val month: MutableState<Int?> = remember { mutableStateOf(null) }
@@ -45,7 +50,9 @@ fun CalendarDialog(enabled: Boolean, onDismissRequest: () -> Unit, onConfirmClic
 
         CustomDateTimeDialog(onDismissRequest = onDismissRequest) {
             // TODO Proper theming
-            Surface() {
+            Surface(
+                color = Color.White
+            ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -56,11 +63,27 @@ fun CalendarDialog(enabled: Boolean, onDismissRequest: () -> Unit, onConfirmClic
                         month.value = m + 1
                         dayOfMonth.value = d
                     })
-                    Button(
-                        enabled = year.value != null && month.value != null && dayOfMonth.value != null,
-                        onClick = { onConfirmClick(year.value!!, month.value!!, dayOfMonth.value!!) }
-                    ) {
-                        Text(stringResource(R.string.button_confirm).uppercase())
+                    Row() {
+                        Button(
+                            enabled = year.value != null && month.value != null && dayOfMonth.value != null,
+                            onClick = { onConfirmClick(year.value!!, month.value!!, dayOfMonth.value!!) },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.primary,
+                                contentColor = MaterialTheme.colors.onPrimary
+                            )
+                        ) {
+                            Text(stringResource(R.string.button_confirm).uppercase())
+                        }
+                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                        Button(
+                            onClick = { onConfirmClick(null, null, null) },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.primaryVariant,
+                                contentColor = MaterialTheme.colors.onPrimary
+                            )
+                        ) {
+                            Text(stringResource(R.string.card_delete_item).uppercase())
+                        }
                     }
                 }
             }

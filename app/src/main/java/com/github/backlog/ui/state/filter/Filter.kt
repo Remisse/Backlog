@@ -13,6 +13,6 @@ interface Filter<V, E> {
     val condition: BiPredicate<E, V>
 
     fun test(entity: E): Boolean {
-        return !enabled || (enabled && condition.test(entity, value))
+        return !enabled || condition.test(entity, value)
     }
 }

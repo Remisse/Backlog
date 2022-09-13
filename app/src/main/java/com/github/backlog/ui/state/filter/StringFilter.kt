@@ -12,5 +12,5 @@ class StringFilter<E>(override val nameResId: Int,
 
     override var value: String by mutableStateOf(initialValue)
 
-    override var enabled: Boolean = value != ""
+    override var enabled: Boolean = true
 }

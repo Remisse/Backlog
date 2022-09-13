@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import com.github.backlog.model.TaskStatus
 import com.github.backlog.model.database.backlog.entity.Task
 import com.github.backlog.ui.state.form.validator.Required
+import com.github.backlog.utils.localDateFromEpochSecond
+import com.github.backlog.utils.toEpochSecond
 import java.lang.IllegalStateException
 import java.time.LocalDate
 
@@ -13,7 +15,7 @@ data class TaskFormState(
     var uid: Int = 0,
     val description: FormElement<String> = FormElement("", Required()),
     val gameId: FormElement<Int?> = FormElement(null, Required()),
-    val deadline: FormElement<LocalDate?> = FormElement(null, Required())
+    val deadline: FormElement<LocalDate?> = FormElement(null)
 ) : FormState<Task> {
 
     var gameAndPlatform by mutableStateOf("")
@@ -28,7 +30,7 @@ data class TaskFormState(
             uid = uid,
             description = description.value,
             gameId = gameId.value!!,
-            deadlineDateEpochDay = deadline.value!!.toEpochDay(),
+            deadline = deadline.value?.toEpochSecond(),
             status = TaskStatus.IN_PROGRESS
         )
     }
@@ -37,6 +39,6 @@ data class TaskFormState(
         uid = entity.uid
         description.value = entity.description
         gameId.value = entity.gameId
-        deadline.value = entity.deadlineDateEpochDay?.let { LocalDate.ofEpochDay(it) }
+        deadline.value = entity.deadline?.let { localDateFromEpochSecond(it) }
     }
 }

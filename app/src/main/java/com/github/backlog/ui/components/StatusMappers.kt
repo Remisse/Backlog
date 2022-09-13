@@ -1,7 +1,7 @@
 package com.github.backlog.ui.components
 
 import androidx.compose.ui.graphics.Color
-import com.example.backlog.R
+import com.github.backlog.R
 import com.github.backlog.model.GameStatus
 import com.github.backlog.model.TaskStatus
 import com.github.backlog.ui.theme.*

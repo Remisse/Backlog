@@ -13,6 +13,10 @@ val YellowTetrad1 = Color(0xFFDF9B24)
 val OrangeTetrad1 = Color(0xFFDF7024)
 
 val CyanAdjacent1 = Color(0xFF009B95)
-val BlueAdjacent1 = Color(0xFF1142AA)
+val BlueAdjacent1 = Color(0xFF1172AA)
 val GreenAdjacent1 = Color(0xFF0ACF00)
 val OrangeAdjacent1Complementary = Color(0xFFFF7100)
+
+val Teal1 = Color(0xFF00B5B5)
+val Blue1 = Color(0xFF0A6FBD)
+val LightGreen = Color(0xFF00C571)

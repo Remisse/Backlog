@@ -2,17 +2,29 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "55560b314c308db1fad4116b2c73c949",
+    "identityHash": "56485f98875d36b74e671e7a9826fcb0",
     "entities": [
       {
         "tableName": "Game",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `platform` TEXT NOT NULL, `status` TEXT NOT NULL, `developer` TEXT, `publisher` TEXT, `genre` TEXT, `release_date` INTEGER, `cover_path` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `steam_id` TEXT, `rawg_id` TEXT, `title` TEXT NOT NULL, `platform` TEXT, `status` TEXT NOT NULL, `developer` TEXT, `publisher` TEXT, `genre` TEXT, `cover_path` TEXT)",
         "fields": [
           {
             "fieldPath": "uid",
             "columnName": "uid",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "steamId",
+            "columnName": "steam_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rawgId",
+            "columnName": "rawg_id",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "title",
@@ -24,7 +36,7 @@
             "fieldPath": "platform",
             "columnName": "platform",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "status",
@@ -51,12 +63,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "releaseDate",
-            "columnName": "release_date",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
             "fieldPath": "coverPath",
             "columnName": "cover_path",
             "affinity": "TEXT",
@@ -69,7 +75,26 @@
             "uid"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Game_steam_id",
+            "unique": true,
+            "columnNames": [
+              "steam_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Game_steam_id` ON `${TABLE_NAME}` (`steam_id`)"
+          },
+          {
+            "name": "index_Game_rawg_id",
+            "unique": true,
+            "columnNames": [
+              "rawg_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Game_rawg_id` ON `${TABLE_NAME}` (`rawg_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -97,12 +122,62 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "GameSearch",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` TEXT NOT NULL, `search` TEXT NOT NULL, PRIMARY KEY(`game_id`, `search`), FOREIGN KEY(`game_id`) REFERENCES `Game`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`search`) REFERENCES `Search`(`query`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "gameId",
+            "columnName": "game_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "search",
+            "columnName": "search",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "game_id",
+            "search"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "Game",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "game_id"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "Search",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "search"
+            ],
+            "referencedColumns": [
+              "query"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '55560b314c308db1fad4116b2c73c949')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '56485f98875d36b74e671e7a9826fcb0')"
     ]
   }
 }

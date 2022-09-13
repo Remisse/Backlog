@@ -1,21 +1,26 @@
 package com.github.backlog.model.database.backlog.entity
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
+import androidx.room.*
 import androidx.room.ForeignKey.Companion.CASCADE
-import androidx.room.PrimaryKey
 import com.github.backlog.model.TaskStatus
 
-@Entity(foreignKeys = [ForeignKey(
-    entity = Game::class,
-    parentColumns = ["uid"],
-    childColumns = ["gameId"],
-    onDelete = CASCADE)]
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = Game::class,
+            parentColumns = ["uid"],
+            childColumns = ["game_id"],
+            onDelete = CASCADE)
+    ],
+    indices = [
+        Index(value = ["game_id"], unique = false)
+    ]
 )
 data class Task(
     @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     val description: String,
-    val gameId: Int,
-    val deadlineDateEpochDay: Long?,
-    val status: TaskStatus
+    @ColumnInfo(name = "game_id") val gameId: Int,
+    val deadline: Long?,
+    val status: TaskStatus,
+    val notified: Boolean = false
 )

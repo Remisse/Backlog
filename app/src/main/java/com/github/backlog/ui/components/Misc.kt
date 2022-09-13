@@ -1,6 +1,5 @@
 package com.github.backlog.ui.components
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloat
@@ -8,8 +7,11 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,46 +19,51 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.example.backlog.R
-import com.github.backlog.ui.theme.Teal200
+import com.github.backlog.R
 
 @Composable
-fun TextIcon(
-    text: String,
+fun TextLabel(
+    text: @Composable () -> Unit,
+    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    style: TextStyle = TextStyle.Default,
-    textColor: Color = Color.Unspecified,
-    imageVector: ImageVector,
-    iconTint: Color = Color.Unspecified,
-    iconModifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(imageVector = imageVector, contentDescription = null, tint = iconTint, modifier = iconModifier)
-        Text(text = text, style = style, color = textColor)
+        label()
+        text()
     }
 }
 
 @Composable
-fun CardSubtitleTextIcon(text: String, imageVector: ImageVector) {
-    TextIcon(
-        text = text,
-        imageVector = imageVector,
-        style = MaterialTheme.typography.caption,
-        textColor = LocalContentColor.current.copy(alpha = 0.75f),
-        iconTint = Teal200,
-        iconModifier = Modifier.size(16.dp)
+fun CardSubtitleTextLabel(
+    text: String,
+    label: @Composable () -> Unit
+) {
+    TextLabel(
+        text = {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.caption,
+                color = LocalContentColor.current.copy(alpha = 0.75f))
+        },
+        label
     )
 }
 
+// onChangeStatusClick, onEditClick and onDeleteClick will generate errors at compile time if inlined
 @Composable
-fun ItemCard(modifier: Modifier, exposedText: @Composable () -> Unit, hiddenText: (@Composable () -> Unit)?,
-             onChangeStatusClick: () -> Unit, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
+inline fun ItemCard(
+    modifier: Modifier,
+    crossinline exposedText: @Composable () -> Unit,
+    noinline hiddenText: (@Composable () -> Unit)?,
+    noinline onChangeStatusClick: () -> Unit,
+    noinline onEditClick: () -> Unit,
+    noinline onDeleteClick: () -> Unit
+) {
     var isExpanded by remember { mutableStateOf(false) }
     var showActionMenu by remember { mutableStateOf(false) }
 
@@ -67,7 +74,7 @@ fun ItemCard(modifier: Modifier, exposedText: @Composable () -> Unit, hiddenText
         backgroundColor = MaterialTheme.colors.background,
         modifier = modifier
     ) {
-        Surface(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+        Surface(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
             Column(modifier = Modifier.animateContentSize()
                 .fillMaxWidth()) {
                 Row(
@@ -86,14 +93,14 @@ fun ItemCard(modifier: Modifier, exposedText: @Composable () -> Unit, hiddenText
                             IconButton(onClick = { showActionMenu = !showActionMenu }) {
                                 Icon(
                                     imageVector = Icons.Default.MoreHoriz,
-                                    contentDescription = null
+                                    contentDescription = stringResource(R.string.alt_card_menu_button)
                                 )
                             }
                             if (hiddenText != null) {
                                 IconButton(onClick = { isExpanded = !isExpanded }) {
                                     Icon(
                                         imageVector = Icons.Default.ExpandMore,
-                                        contentDescription = null,
+                                        contentDescription = stringResource(R.string.alt_card_details_button),
                                         modifier = Modifier.rotate(rotation.value)
                                     )
                                 }
@@ -142,15 +149,19 @@ fun ItemCard(modifier: Modifier, exposedText: @Composable () -> Unit, hiddenText
 }
 
 @Composable
-fun ActionsFab(@StringRes textRes: Int, icon: ImageVector, modifier: Modifier,
-               miniFabs: @Composable () -> Unit) {
+fun ActionsFab(
+    icon: ImageVector,
+    modifier: Modifier,
+    miniFabs: @Composable () -> Unit
+) {
     val isClicked: MutableState<Boolean> = remember { mutableStateOf(false) }
 
     val transition = updateTransition(targetState = isClicked.value, label = "FabClick")
     val rotation = transition.animateFloat(label = "") { if (!it) 0f else -45f }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.End,
         modifier = modifier
     ) {
         AnimatedVisibility(
@@ -164,17 +175,17 @@ fun ActionsFab(@StringRes textRes: Int, icon: ImageVector, modifier: Modifier,
                 miniFabs()
             }
         }
-        ExtendedFloatingActionButton(
-            text = { Text(stringResource(textRes).uppercase()) } ,
+        FloatingActionButton(
             onClick = { isClicked.value = !isClicked.value },
-            icon = {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.rotate(rotation.value)
-                )
-            },
-        )
+            backgroundColor = MaterialTheme.colors.primary,
+            contentColor = MaterialTheme.colors.onPrimary
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.rotate(rotation.value)
+            )
+        }
     }
 }
 

@@ -2,17 +2,29 @@
   "formatVersion": 1,
   "database": {
     "version": 11,
-    "identityHash": "2c7b632776bf40b80df0f4cbb97ebd86",
+    "identityHash": "0b7658894dc09a3ea2bff856c138831f",
     "entities": [
       {
         "tableName": "Game",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `platform` TEXT NOT NULL, `status` TEXT NOT NULL, `developer` TEXT, `publisher` TEXT, `genre` TEXT, `release_date` INTEGER, `cover_path` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `steam_id` TEXT, `rawg_id` TEXT, `title` TEXT NOT NULL, `platform` TEXT, `status` TEXT NOT NULL, `developer` TEXT, `publisher` TEXT, `genre` TEXT, `cover_path` TEXT)",
         "fields": [
           {
             "fieldPath": "uid",
             "columnName": "uid",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "steamId",
+            "columnName": "steam_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rawgId",
+            "columnName": "rawg_id",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "title",
@@ -24,7 +36,7 @@
             "fieldPath": "platform",
             "columnName": "platform",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "status",
@@ -51,12 +63,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "releaseDate",
-            "columnName": "release_date",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
             "fieldPath": "coverPath",
             "columnName": "cover_path",
             "affinity": "TEXT",
@@ -69,7 +75,26 @@
             "uid"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Game_steam_id",
+            "unique": true,
+            "columnNames": [
+              "steam_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Game_steam_id` ON `${TABLE_NAME}` (`steam_id`)"
+          },
+          {
+            "name": "index_Game_rawg_id",
+            "unique": true,
+            "columnNames": [
+              "rawg_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Game_rawg_id` ON `${TABLE_NAME}` (`rawg_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -132,7 +157,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2c7b632776bf40b80df0f4cbb97ebd86')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0b7658894dc09a3ea2bff856c138831f')"
     ]
   }
 }
