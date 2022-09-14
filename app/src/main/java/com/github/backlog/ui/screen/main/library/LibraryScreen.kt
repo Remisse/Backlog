@@ -5,23 +5,22 @@ import androidx.compose.material.DrawerState
 import androidx.compose.runtime.Composable
 import com.github.backlog.Section
 import com.github.backlog.ui.screen.main.MainScreen
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 
 open class LibraryScreen(private val onEditCardButtonClick: (Int) -> Unit,
                          private val onOnlineSearchButtonClick: () -> Unit,
                          private val onCreateButtonClick: () -> Unit,
                          private val onSteamImportClick: () -> Unit,
                          drawerState: DrawerState,
-                         accessor: ViewModelContainerAccessor
-) : MainScreen(drawerState, accessor) {
+                         vmFactories: ViewModelFactoryStore
+) : MainScreen(drawerState, vmFactories) {
     override val section: Section = Section.Library
 
     @Composable
     override fun Content(arguments: Bundle?) {
         BacklogScreen(
             onEditCardClick = onEditCardButtonClick,
-            gameViewModel = viewModelContainer().gameViewModel
+            gameViewModel = gameViewModel()
         )
     }
 
@@ -36,12 +35,13 @@ open class LibraryScreen(private val onEditCardButtonClick: (Int) -> Unit,
     
     @Composable
     override fun TopBarExtraButtons() {
+        val vm = gameViewModel()
         BacklogTopBarExtra(
             onSearchClick = {
-                viewModelContainer().gameViewModel.filterState.titleFilter.value = it
+                vm.filterState.titleFilter.value = it
             },
             onFilterClick = {
-                viewModelContainer().gameViewModel.filterState.shouldShowFilters = true
+                vm.filterState.shouldShowFilters = true
             }
         )
     }

@@ -8,26 +8,25 @@ import androidx.compose.ui.res.stringResource
 import com.github.backlog.R
 import com.github.backlog.Section
 import com.github.backlog.ui.state.form.GameFormState
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 import com.github.backlog.utils.errorToLocalizedString
 
 class GameFormEdit(
     private val onCancelDialogConfirm: () -> Unit,
     private val onSuccess: () -> Unit,
-    accessor: ViewModelContainerAccessor
-) : BaseGameForm(accessor) {
+    vmFactories: ViewModelFactoryStore
+) : BaseGameForm(vmFactories) {
 
     override val section: Section = Section.GameEdit
 
     @Composable
     override fun Content(arguments: Bundle?) {
-        val formState = viewModelContainer().gameViewModel.formState
+        val gameViewModel = gameViewModel()
 
         LaunchedEffect(Unit) {
-            viewModelContainer().gameViewModel.entityById(arguments?.getInt("gameId")!!)
+            gameViewModel.entityById(arguments?.getInt("gameId")!!)
                 .collect {
-                    formState.fromEntity(it)
+                    gameViewModel.formState.fromEntity(it)
                 }
         }
 
@@ -43,10 +42,10 @@ class GameFormEdit(
         GameEditScreen(
             onDialogSubmitClick = onCancelDialogConfirm,
             onCommitButtonClick = {
-                val errors = formState.validateAll()
+                val errors = gameViewModel.formState.validateAll()
                 if (errors.isEmpty()) {
-                    viewModelContainer().gameViewModel.update(
-                        entity = formState.toEntity(),
+                    gameViewModel.update(
+                        entity = gameViewModel.formState.toEntity(),
                         onSuccess = {
                             successToast.show()
                             onSuccess()
@@ -61,7 +60,7 @@ class GameFormEdit(
                     ).show()
                 }
             },
-            state = formState
+            state = gameViewModel.formState
         )
     }
 }

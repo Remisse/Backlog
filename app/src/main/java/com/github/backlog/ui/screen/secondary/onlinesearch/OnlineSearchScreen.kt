@@ -8,7 +8,7 @@ import com.github.backlog.Section
 import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.components.ErrorDialog
 import com.github.backlog.ui.screen.BaseScreen
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 import com.github.backlog.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
 class OnlineSearchScreen(
     private val onBackClick: () -> Unit,
     private val onGameClick: (String) -> Unit,
-    accessor: ViewModelContainerAccessor
-) : BaseScreen(accessor) {
+    vmFactories: ViewModelFactoryStore
+) : BaseScreen(vmFactories) {
     private var searchQuery by mutableStateOf("")
     private var searchResults: Flow<List<Game>> = emptyFlow()
     private var searchPerformed by mutableStateOf(false)
@@ -27,12 +27,13 @@ class OnlineSearchScreen(
 
     @Composable
     override fun Content(arguments: Bundle?) {
-        if (viewModelContainer().onlineSearchViewModel.isNetworkError
-            && !viewModelContainer().onlineSearchViewModel.isErrorShown) {
+        val onlineSearchViewModel = onlineSearchViewModel()
+
+        if (onlineSearchViewModel.isNetworkError && !onlineSearchViewModel.isErrorShown) {
             ErrorDialog(
                 errorMessage = stringResource(R.string.error_generic),
-                onConfirmClick = { viewModelContainer().onlineSearchViewModel.isErrorShown = true },
-                onDismissRequest = { viewModelContainer().onlineSearchViewModel.isErrorShown = true }
+                onConfirmClick = { onlineSearchViewModel.isErrorShown = true },
+                onDismissRequest = { onlineSearchViewModel.isErrorShown = true }
             )
         }
         OnlineSearchContent(
@@ -47,6 +48,7 @@ class OnlineSearchScreen(
 
     @Composable
     override fun TopBar() {
+        val onlineSearchViewModel = onlineSearchViewModel()
         val scope = rememberCoroutineScope()
 
         TopSearchBar(
@@ -56,7 +58,7 @@ class OnlineSearchScreen(
             onSearchSubmit = {
                 scope.launch {
                     searchPerformed = false
-                    searchResults = viewModelContainer().onlineSearchViewModel.performSearch(searchQuery)
+                    searchResults = onlineSearchViewModel.performSearch(searchQuery)
                     searchPerformed = true
                 }
             }

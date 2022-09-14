@@ -6,14 +6,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.github.backlog.Section
 import com.github.backlog.ui.screen.BaseScreen
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 
 class SteamDialogScreen(
     private val onDismissRequest: () -> Unit,
     private val onConfirmClick: (String) -> Unit,
-    accessor: ViewModelContainerAccessor
-) : BaseScreen(accessor) {
+    vmFactories: ViewModelFactoryStore
+) : BaseScreen(vmFactories) {
 
     override val section: Section = Section.SteamImportPrep
 

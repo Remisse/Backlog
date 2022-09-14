@@ -8,21 +8,21 @@ import androidx.compose.ui.res.stringResource
 import com.github.backlog.R
 import com.github.backlog.Section
 import com.github.backlog.ui.state.form.GameFormState
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 import com.github.backlog.utils.errorToLocalizedString
 
 class GameFormAdd(
     private val onCancelDialogConfirm: () -> Unit,
     private val onSuccess: () -> Unit,
-    accessor: ViewModelContainerAccessor
-) : BaseGameForm(accessor) {
+    vmFactories: ViewModelFactoryStore
+) : BaseGameForm(vmFactories) {
 
     override val section: Section = Section.GameAdd
 
     @Composable
     override fun Content(arguments: Bundle?) {
-        val formState = viewModelContainer().gameViewModel.formState
+        val gameViewModel = gameViewModel()
+        val formState = gameViewModel.formState
 
         val successToast = Toast.makeText(
             LocalContext.current,
@@ -38,7 +38,7 @@ class GameFormAdd(
             onCommitButtonClick = {
                 val errors = formState.validateAll()
                 if (errors.isEmpty()) {
-                    viewModelContainer().gameViewModel.insert(
+                    gameViewModel.insert(
                         entity = formState.toEntity(),
                         onSuccess = {
                             successToast.show()

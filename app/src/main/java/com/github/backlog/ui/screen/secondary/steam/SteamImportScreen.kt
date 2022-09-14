@@ -17,25 +17,27 @@ import com.github.backlog.Section
 import com.github.backlog.ui.components.ErrorDialog
 import com.github.backlog.ui.components.SubScreenTopBar
 import com.github.backlog.ui.screen.BaseScreen
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 
 class SteamImportScreen(
     private val onBackClick: () -> Unit,
     private val onSuccess: () -> Unit,
     private val onNetworkErrorAcknowledge: () -> Unit,
-    accessor: ViewModelContainerAccessor
-) : BaseScreen(accessor) {
+    vmFactories: ViewModelFactoryStore
+) : BaseScreen(vmFactories) {
 
     override val section: Section = Section.SteamImport
 
     @Composable
     override fun Content(arguments: Bundle?) {
+        val onlineSearchViewModel = onlineSearchViewModel()
+        val gameViewModel = gameViewModel()
+
         val steamId = arguments?.getString("steamId")!!
-        val games by viewModelContainer().onlineSearchViewModel.retrieveSteamLibrary(steamId)
+        val games by onlineSearchViewModel.retrieveSteamLibrary(steamId)
             .collectAsState(initial = emptyList())
 
-        if (games.isEmpty() && !viewModelContainer().onlineSearchViewModel.isNetworkError) {
+        if (games.isEmpty() && !onlineSearchViewModel.isNetworkError) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -49,13 +51,12 @@ class SteamImportScreen(
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
                 CircularProgressIndicator()
             }
-        } else if (viewModelContainer().onlineSearchViewModel.isNetworkError
-            && !viewModelContainer().onlineSearchViewModel.isErrorShown
+        } else if (onlineSearchViewModel.isNetworkError && !onlineSearchViewModel.isErrorShown
         ) {
             ErrorDialog(
                 errorMessage = stringResource(R.string.steam_import_prep_error),
                 onConfirmClick = {
-                    viewModelContainer().onlineSearchViewModel.isErrorShown = true
+                    onlineSearchViewModel.isErrorShown = true
                     onNetworkErrorAcknowledge()
                 },
                 onDismissRequest = { /* Empty */}
@@ -75,7 +76,7 @@ class SteamImportScreen(
             SteamImportContent(
                 games = games.sortedBy { it.title },
                 onConfirmClick =  {
-                    viewModelContainer().gameViewModel.insertAll(
+                    gameViewModel.insertAll(
                         entities = it.toList(),
                         onSuccess = {
                             successToast.show()

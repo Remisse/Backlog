@@ -9,11 +9,11 @@ import androidx.activity.compose.setContent
 import com.github.backlog.ui.navigation.NavigationRoot
 import com.github.backlog.ui.navigation.rememberNavigationState
 import com.github.backlog.ui.theme.BacklogTheme
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var accessor: ViewModelContainerAccessor
+    private lateinit var vmFactories: ViewModelFactoryStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +30,11 @@ class MainActivity : ComponentActivity() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
 
-        accessor = (application as BacklogApplication).viewModelContainerAccessor
+        vmFactories = (application as BacklogApplication).viewModelFactoryStore
 
         setContent {
-            BacklogTheme() {
-                NavigationRoot(rememberNavigationState(accessor = accessor))
+            BacklogTheme {
+                NavigationRoot(rememberNavigationState(vmFactories = vmFactories))
             }
         }
     }

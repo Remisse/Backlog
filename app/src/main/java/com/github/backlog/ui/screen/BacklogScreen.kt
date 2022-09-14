@@ -2,6 +2,7 @@ package com.github.backlog.ui.screen
 
 import android.os.Bundle
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavHostController
 import com.github.backlog.Section
 
@@ -20,4 +21,6 @@ interface BacklogScreen {
 
     @Composable
     fun Fab()
+
+    val viewModelStoreOwner: ViewModelStoreOwner
 }

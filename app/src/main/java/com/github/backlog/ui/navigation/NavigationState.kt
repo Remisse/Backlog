@@ -2,35 +2,30 @@ package com.github.backlog.ui.navigation
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import com.github.backlog.Section
 import com.github.backlog.ui.screen.BacklogScreen
-import com.github.backlog.ui.screen.secondary.steam.SteamDialogScreen
-import com.github.backlog.ui.screen.main.profile.ProfileScreen
 import com.github.backlog.ui.screen.main.library.LibraryScreen
+import com.github.backlog.ui.screen.main.profile.ProfileScreen
 import com.github.backlog.ui.screen.main.tasks.TaskScreen
-import com.github.backlog.ui.screen.main.tasks.TaskScreenContent
 import com.github.backlog.ui.screen.secondary.gameform.GameFormAdd
 import com.github.backlog.ui.screen.secondary.gameform.GameFormEdit
 import com.github.backlog.ui.screen.secondary.onlinesearch.GameFormOnlineImport
 import com.github.backlog.ui.screen.secondary.onlinesearch.OnlineSearchScreen
+import com.github.backlog.ui.screen.secondary.steam.SteamDialogScreen
 import com.github.backlog.ui.screen.secondary.steam.SteamImportScreen
 import com.github.backlog.ui.screen.secondary.taskform.TaskFormAdd
 import com.github.backlog.ui.screen.secondary.taskform.TaskFormEdit
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class NavigationState(val scaffoldState: ScaffoldState,
                       val navController: NavHostController,
-                      accessor: ViewModelContainerAccessor
+                      vmFactories: ViewModelFactoryStore
 ) {
     private val _navigateUp: () -> Unit = { navController.navigateUp() }
 
@@ -41,17 +36,17 @@ class NavigationState(val scaffoldState: ScaffoldState,
             onCreateButtonClick = { navController.navigate(Section.GameAdd.route) },
             onSteamImportClick = { navController.navigate(Section.SteamImportPrep.route) },
             drawerState = scaffoldState.drawerState,
-            accessor = accessor
+            vmFactories = vmFactories
         ),
         TaskScreen(
             onTaskEditClick = { navController.navigate("${Section.TaskEdit.route}/$it") },
             onCreateClick = { navController.navigate(Section.TaskAdd.route) },
             drawerState = scaffoldState.drawerState,
-            accessor = accessor
+            vmFactories = vmFactories
         ),
         ProfileScreen(
             drawerState = scaffoldState.drawerState,
-            accessor = accessor
+            vmFactories = vmFactories
         )
     )
 
@@ -59,17 +54,17 @@ class NavigationState(val scaffoldState: ScaffoldState,
         GameFormAdd(
             onSuccess = _navigateUp,
             onCancelDialogConfirm = _navigateUp,
-            accessor = accessor
+            vmFactories = vmFactories
         ),
         TaskFormAdd(
             onSuccess = _navigateUp,
             onDialogSubmitClick = _navigateUp,
-            accessor = accessor
+            vmFactories = vmFactories
         ),
         OnlineSearchScreen(
             onBackClick = _navigateUp,
             onGameClick = { navController.navigate("${Section.OnlineImport.route}/$it") },
-            accessor = accessor
+            vmFactories = vmFactories
         )
     )
 
@@ -77,24 +72,24 @@ class NavigationState(val scaffoldState: ScaffoldState,
         GameFormEdit(
             onSuccess = _navigateUp,
             onCancelDialogConfirm = _navigateUp,
-            accessor = accessor
+            vmFactories = vmFactories
         ) to Pair("gameId", NavType.IntType),
         TaskFormEdit(
             onSuccess = _navigateUp,
             onDialogSubmitClick = _navigateUp,
-            accessor = accessor
+            vmFactories = vmFactories
         ) to Pair("taskId",NavType.IntType),
         GameFormOnlineImport(
             onCancelDialogConfirm = _navigateUp,
             onSuccess = _navigateUp,
-            accessor = accessor,
+            vmFactories = vmFactories,
             onNetworkErrorAcknowledge = _navigateUp
         ) to Pair("gameId", NavType.StringType),
         SteamImportScreen(
             onBackClick = _navigateUp,
             onSuccess = _navigateUp,
             onNetworkErrorAcknowledge = _navigateUp,
-            accessor = accessor
+            vmFactories = vmFactories
         ) to Pair("steamId", NavType.StringType)
     )
 
@@ -102,7 +97,7 @@ class NavigationState(val scaffoldState: ScaffoldState,
         SteamDialogScreen(
             onDismissRequest = _navigateUp,
             onConfirmClick = { navController.navigate("${Section.SteamImport.route}/$it") },
-            accessor = accessor
+            vmFactories = vmFactories
         )
     )
 
@@ -133,14 +128,17 @@ class NavigationState(val scaffoldState: ScaffoldState,
     init {
         _currentScreen.value = startingScreen
 
-        // When navigating to a new screen, update the current screen and reinitialize all ViewModels.
+        /*
+         * When navigating to a new screen, update the current one and clear the VMs of the
+         * previous screen.
+         */
         navController.addOnDestinationChangedListener { _, destination, _ ->
             _from.value = _currentScreen.value
             _currentScreen.value = _allScreens.find {
                 baseRoute(it.section.route) == baseRoute(destination.route.orEmpty())
             }!!
 
-            accessor.clear()
+            _from.value.viewModelStoreOwner.viewModelStore.clear()
         }
     }
 
@@ -163,9 +161,9 @@ class NavigationState(val scaffoldState: ScaffoldState,
 @Composable
 fun rememberNavigationState(scaffoldState: ScaffoldState = rememberScaffoldState(),
                             navController: NavHostController = rememberAnimatedNavController(),
-                            accessor: ViewModelContainerAccessor
+                            vmFactories: ViewModelFactoryStore
 ): NavigationState {
-    return remember(scaffoldState, navController, accessor) {
-        NavigationState(scaffoldState, navController, accessor)
+    return remember(scaffoldState, navController, vmFactories) {
+        NavigationState(scaffoldState, navController, vmFactories)
     }
 }

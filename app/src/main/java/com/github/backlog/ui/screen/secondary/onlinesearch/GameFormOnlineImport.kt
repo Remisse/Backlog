@@ -17,8 +17,7 @@ import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.components.ErrorDialog
 import com.github.backlog.ui.screen.secondary.gameform.BaseGameForm
 import com.github.backlog.ui.screen.secondary.gameform.GameAddScreen
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 import com.github.backlog.utils.errorToLocalizedString
 import kotlinx.coroutines.launch
 
@@ -26,20 +25,23 @@ class GameFormOnlineImport(
     private val onCancelDialogConfirm: () -> Unit,
     private val onSuccess: () -> Unit,
     private val onNetworkErrorAcknowledge: () -> Unit,
-    accessor: ViewModelContainerAccessor
-) : BaseGameForm(accessor) {
+    vmFactories: ViewModelFactoryStore
+) : BaseGameForm(vmFactories) {
 
     override val section = Section.OnlineImport
 
     @Composable
     override fun Content(arguments: Bundle?) {
+        val gameViewModel = gameViewModel()
+        val onlineSearchViewModel = onlineSearchViewModel()
+
         val detailedGame: MutableState<Game?> = remember { mutableStateOf(null) }
-        val formState = viewModelContainer().gameViewModel.formState
+        val formState = gameViewModel.formState
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
             scope.launch {
-                viewModelContainer().onlineSearchViewModel
+                onlineSearchViewModel
                     .retrieveGameDetails(arguments?.getString("gameId")!!)
                     .collect {
                         detailedGame.value = it
@@ -48,12 +50,11 @@ class GameFormOnlineImport(
             }
         }
 
-        if (viewModelContainer().onlineSearchViewModel.isNetworkError
-            && !viewModelContainer().onlineSearchViewModel.isErrorShown) {
+        if (onlineSearchViewModel.isNetworkError && !onlineSearchViewModel.isErrorShown) {
             ErrorDialog(
                 errorMessage = stringResource(R.string.error_generic),
                 onConfirmClick = {
-                    viewModelContainer().onlineSearchViewModel.isErrorShown = true
+                    onlineSearchViewModel.isErrorShown = true
                     onNetworkErrorAcknowledge()
                 },
                 onDismissRequest = { /* Empty */ }
@@ -89,7 +90,7 @@ class GameFormOnlineImport(
                 onCommitButtonClick = {
                     val errors = formState.validateAll()
                     if (errors.isEmpty()) {
-                        viewModelContainer().gameViewModel.insert(
+                        gameViewModel.insert(
                             entity = formState.toEntity(),
                             onSuccess = {
                                 successToast.show()

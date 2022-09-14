@@ -5,15 +5,14 @@ import androidx.compose.material.DrawerState
 import androidx.compose.runtime.Composable
 import com.github.backlog.Section
 import com.github.backlog.ui.screen.main.MainScreen
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 
 class TaskScreen(
     private val onTaskEditClick: (Int) -> Unit,
     private val onCreateClick: () -> Unit,
     drawerState: DrawerState,
-    accessor: ViewModelContainerAccessor
-) : MainScreen(drawerState, accessor) {
+    vmFactories: ViewModelFactoryStore
+) : MainScreen(drawerState, vmFactories) {
 
     override val section: Section = Section.Tasks
 
@@ -21,7 +20,7 @@ class TaskScreen(
     override fun Content(arguments: Bundle?) {
         TaskScreenContent(
             onTaskEditClick = onTaskEditClick,
-            taskViewModel = viewModelContainer().taskViewModel
+            taskViewModel = taskViewModel()
         )
     }
 

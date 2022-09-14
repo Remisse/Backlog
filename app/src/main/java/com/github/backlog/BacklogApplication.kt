@@ -7,16 +7,14 @@ import androidx.work.WorkManager
 import com.github.backlog.model.database.backlog.BacklogDatabase
 import com.github.backlog.model.database.searchcache.SearchCacheDatabase
 import com.github.backlog.model.onlineservice.OnlineSearchClient
-import com.github.backlog.utils.ViewModelContainerAccessor
-import com.github.backlog.utils.ViewModelContainerAccessorImpl
+import com.github.backlog.utils.ViewModelFactoryStore
+import com.github.backlog.utils.ViewModelFactoryStoreImpl
 
 const val CHANNEL_ID = "deadline"
 
 class BacklogApplication : Application() {
     private val backlogDatabase: BacklogDatabase by lazy {
         Room.databaseBuilder(applicationContext, BacklogDatabase::class.java, "backlog_database")
-                // TODO Delete
-            .fallbackToDestructiveMigration()
             .build()
     }
     private val searchCacheDatabase: SearchCacheDatabase by lazy {
@@ -26,8 +24,8 @@ class BacklogApplication : Application() {
 
     private val onlineSearchClient = OnlineSearchClient()
 
-    val viewModelContainerAccessor: ViewModelContainerAccessor by lazy {
-        ViewModelContainerAccessorImpl(
+    val viewModelFactoryStore: ViewModelFactoryStore by lazy {
+        ViewModelFactoryStoreImpl(
             backlogDatabase,
             searchCacheDatabase,
             WorkManager.getInstance(this),

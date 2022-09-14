@@ -11,16 +11,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.github.backlog.R
 import com.github.backlog.Section
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 import com.github.backlog.viewmodel.GameViewModel
 import com.github.backlog.viewmodel.TaskViewModel
 import kotlinx.coroutines.launch
 
 class TaskFormEdit(private val onDialogSubmitClick: () -> Unit,
                    private val onSuccess: () -> Unit,
-                   accessor: ViewModelContainerAccessor
-) : BaseTaskForm(accessor) {
+                   vmFactories: ViewModelFactoryStore
+) : BaseTaskForm(vmFactories) {
 
     override val section: Section = Section.TaskEdit
 
@@ -30,8 +29,8 @@ class TaskFormEdit(private val onDialogSubmitClick: () -> Unit,
             taskId = arguments?.getInt("taskId")!!,
             onEditSuccess = onSuccess,
             onCancelDialogSubmitClick = onDialogSubmitClick,
-            gameViewModel = viewModelContainer().gameViewModel,
-            taskViewModel = viewModelContainer().taskViewModel
+            gameViewModel = gameViewModel(),
+            taskViewModel = taskViewModel()
         )
     }
 }

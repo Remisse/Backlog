@@ -6,50 +6,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.github.backlog.Section
 import com.github.backlog.ui.screen.main.MainScreen
-import com.github.backlog.utils.ViewModelContainer
-import com.github.backlog.utils.ViewModelContainerAccessor
+import com.github.backlog.utils.ViewModelFactoryStore
 
 class ProfileScreen(
     drawerState: DrawerState,
-    accessor: ViewModelContainerAccessor
-) : MainScreen(drawerState, accessor) {
+    vmFactories: ViewModelFactoryStore
+) : MainScreen(drawerState, vmFactories) {
 
     override val section: Section = Section.Profile
 
     @Composable
     override fun Content(arguments: Bundle?) {
+        val profileViewModel = profileViewModel()
+        val gameViewModel = gameViewModel()
+        val taskViewModel = taskViewModel()
+
         ProfileScreenContent(
-            profileName = viewModelContainer().profileViewModel.profileName,
-            profileBio = viewModelContainer().profileViewModel.profileBio,
-            profileImage = viewModelContainer().profileViewModel.profileImage,
-            onImageSelect = {
-                viewModelContainer().profileViewModel.saveProfileImage(it)
-            },
-            onNameChange = {
-                viewModelContainer().profileViewModel.saveProfileName(it)
-            },
-            onBioChange = {
-                viewModelContainer().profileViewModel.saveProfileBio(it)
-            },
-            games = viewModelContainer().gameViewModel.backlog
+            profileName = profileViewModel.profileName,
+            profileBio = profileViewModel.profileBio,
+            profileImage = profileViewModel.profileImage,
+            onImageSelect = { profileViewModel.saveProfileImage(it) },
+            onNameChange = { profileViewModel.saveProfileName(it) },
+            onBioChange = { profileViewModel.saveProfileBio(it) },
+            games = gameViewModel.backlog
                 .collectAsState(initial = emptyList())
                 .value,
-            tasks = viewModelContainer().taskViewModel.tasksWithGameTitle
+            tasks = taskViewModel.tasksWithGameTitle
                 .collectAsState(initial = emptyList())
                 .value,
-            completedGamesByGenre = viewModelContainer().gameViewModel.completedGamesByGenre
+            completedGamesByGenre = gameViewModel.completedGamesByGenre
                 .collectAsState(initial = emptyList())
                 .value,
-            completedGamesByDeveloper = viewModelContainer().gameViewModel.completedGamesByDeveloper
+            completedGamesByDeveloper = gameViewModel.completedGamesByDeveloper
                 .collectAsState(initial = emptyList())
                 .value,
-            droppedGamesByGenre = viewModelContainer().gameViewModel.droppedGamesByGenre
+            droppedGamesByGenre = gameViewModel.droppedGamesByGenre
                 .collectAsState(initial = emptyList())
                 .value,
-            droppedGamesByDeveloper = viewModelContainer().gameViewModel.droppedGamesByDeveloper
+            droppedGamesByDeveloper = gameViewModel.droppedGamesByDeveloper
                 .collectAsState(initial = emptyList())
                 .value,
-            completedGamesInCurrentYear = viewModelContainer().gameViewModel.completedGamesInCurrentYear
+            completedGamesInCurrentYear = gameViewModel.completedGamesInCurrentYear
                 .collectAsState(initial = 0)
                 .value
         )
