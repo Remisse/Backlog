@@ -23,6 +23,7 @@ import com.github.backlog.ui.screen.secondary.taskform.TaskFormEdit
 import com.github.backlog.utils.ViewModelFactoryStore
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
+@Stable
 class NavigationState(val scaffoldState: ScaffoldState,
                       val navController: NavHostController,
                       vmFactories: ViewModelFactoryStore
