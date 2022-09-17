@@ -2,8 +2,6 @@ package com.github.backlog.ui.navigation
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,6 +12,8 @@ import com.github.backlog.ui.screen.main.profile.ProfileScreen
 import com.github.backlog.ui.screen.main.tasks.TaskScreen
 import com.github.backlog.ui.screen.secondary.gameform.GameFormAdd
 import com.github.backlog.ui.screen.secondary.gameform.GameFormEdit
+import com.github.backlog.ui.screen.secondary.library.QuickGameDeleteScreen
+import com.github.backlog.ui.screen.secondary.library.QuickStatusChangeDialogScreen
 import com.github.backlog.ui.screen.secondary.onlinesearch.GameFormOnlineImport
 import com.github.backlog.ui.screen.secondary.onlinesearch.OnlineSearchScreen
 import com.github.backlog.ui.screen.secondary.steam.SteamDialogScreen
@@ -23,10 +23,12 @@ import com.github.backlog.ui.screen.secondary.taskform.TaskFormEdit
 import com.github.backlog.utils.ViewModelFactoryStore
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
+val START_ROUTE: String = Section.Library.route
+
 @Stable
-class NavigationState(val scaffoldState: ScaffoldState,
-                      val navController: NavHostController,
-                      vmFactories: ViewModelFactoryStore
+class NavigationState(
+    val navController: NavHostController,
+    vmFactories: ViewModelFactoryStore
 ) {
     private val _navigateUp: () -> Unit = { navController.navigateUp() }
 
@@ -36,17 +38,16 @@ class NavigationState(val scaffoldState: ScaffoldState,
             onOnlineSearchButtonClick = { navController.navigate(Section.OnlineSearch.route) },
             onCreateButtonClick = { navController.navigate(Section.GameAdd.route) },
             onSteamImportClick = { navController.navigate(Section.SteamImportPrep.route) },
-            drawerState = scaffoldState.drawerState,
+            onStatusChangeClick = { navController.navigate("${Section.QuickGameStatusChange.route}/$it") },
+            onDeleteClick = { navController.navigate("${Section.QuickGameDelete.route}/$it") },
             vmFactories = vmFactories
         ),
         TaskScreen(
             onTaskEditClick = { navController.navigate("${Section.TaskEdit.route}/$it") },
             onCreateClick = { navController.navigate(Section.TaskAdd.route) },
-            drawerState = scaffoldState.drawerState,
             vmFactories = vmFactories
         ),
         ProfileScreen(
-            drawerState = scaffoldState.drawerState,
             vmFactories = vmFactories
         )
     )
@@ -102,6 +103,19 @@ class NavigationState(val scaffoldState: ScaffoldState,
         )
     )
 
+    val dialogsWithArgument: Map<BacklogScreen, Pair<String, NavType<*>>> = mapOf(
+        QuickStatusChangeDialogScreen(
+            onDismissRequest = _navigateUp,
+            onStatusSelect = _navigateUp,
+            vmFactories = vmFactories
+        ) to Pair("gameId", NavType.IntType),
+        QuickGameDeleteScreen(
+            onDismissRequest = _navigateUp,
+            onConfirmClick = _navigateUp,
+            vmFactories = vmFactories
+        ) to Pair("gameId", NavType.IntType)
+    )
+
     /**
      * Returns the route name stripped of all arguments, if there are any.
      */
@@ -109,37 +123,42 @@ class NavigationState(val scaffoldState: ScaffoldState,
         return route.split("?", "/")[0]
     }
 
-    val startingScreen: BacklogScreen = mainScreens[0]
-
     /**
      * Source of truth for the currently active screen. Used to dynamically assign Composables
      * to the scaffold.
      */
-    private val _currentScreen: MutableState<BacklogScreen> = mutableStateOf(startingScreen)
+    private var _currentScreen: MutableState<BacklogScreen>
 
     /**
      * Previously active screen.
      */
-    private val _from: MutableState<BacklogScreen> = mutableStateOf(_currentScreen.value)
+    private var _from: BacklogScreen
 
-    private val _allScreens = mainScreens.plus(secondaryScreens)
-        .plus(secondaryWithArgument.keys)
-        .plus(dialogs)
+    private val _allScreens = mainScreens +
+            secondaryScreens +
+            secondaryWithArgument.keys +
+            dialogs +
+            dialogsWithArgument.keys
 
     init {
-        _currentScreen.value = startingScreen
+        _currentScreen =
+            mutableStateOf(_allScreens.find { baseRoute(START_ROUTE) == baseRoute(it.section.route) }!! )
+        _from = _currentScreen.value
 
         /*
          * When navigating to a new screen, update the current one and clear the VMs of the
          * previous screen.
          */
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            _from.value = _currentScreen.value
+            _from = _currentScreen.value
             _currentScreen.value = _allScreens.find {
                 baseRoute(it.section.route) == baseRoute(destination.route.orEmpty())
             }!!
 
-            _from.value.viewModelStoreOwner.viewModelStore.clear()
+            // Prevent an unwanted clear at startup.
+            if (_currentScreen.value != _from) {
+                _from.viewModelStoreOwner.viewModelStore.clear()
+            }
         }
     }
 
@@ -151,7 +170,7 @@ class NavigationState(val scaffoldState: ScaffoldState,
 
     @OptIn(ExperimentalAnimationApi::class)
     fun slideDirection() : AnimatedContentScope.SlideDirection {
-        if (mainScreens.indexOf(_currentScreen.value) > mainScreens.indexOf(_from.value)) {
+        if (mainScreens.indexOf(_currentScreen.value) > mainScreens.indexOf(_from)) {
             return AnimatedContentScope.SlideDirection.Left
         }
         return AnimatedContentScope.SlideDirection.Right
@@ -160,11 +179,11 @@ class NavigationState(val scaffoldState: ScaffoldState,
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun rememberNavigationState(scaffoldState: ScaffoldState = rememberScaffoldState(),
-                            navController: NavHostController = rememberAnimatedNavController(),
-                            vmFactories: ViewModelFactoryStore
+fun rememberNavigationState(
+    navController: NavHostController = rememberAnimatedNavController(),
+    vmFactories: ViewModelFactoryStore
 ): NavigationState {
-    return remember(scaffoldState, navController, vmFactories) {
-        NavigationState(scaffoldState, navController, vmFactories)
+    return remember(navController, vmFactories) {
+        NavigationState(navController, vmFactories)
     }
 }

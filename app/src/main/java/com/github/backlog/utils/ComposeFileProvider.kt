@@ -8,7 +8,7 @@ import com.github.backlog.R
 import java.io.File
 import java.lang.IllegalStateException
 
-class ComposeFileProvider private constructor (): FileProvider(R.xml.provider_paths) {
+sealed class ComposeFileProvider private constructor() : FileProvider(R.xml.provider_paths) {
     companion object {
         fun createNewImageUri(context: Context): Uri {
             val directory = File(context.cacheDir, "images")

@@ -4,8 +4,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -17,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.backlog.R
+import com.github.backlog.ui.state.form.FormElement
 
 @Composable
 fun TextLabel(
@@ -36,22 +39,6 @@ fun TextLabel(
         label()
         text()
     }
-}
-
-@Composable
-fun CardSubtitleTextLabel(
-    text: String,
-    label: @Composable () -> Unit
-) {
-    TextLabel(
-        text = {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.caption,
-                color = LocalContentColor.current.copy(alpha = 0.75f))
-        },
-        label
-    )
 }
 
 // onChangeStatusClick, onEditClick and onDeleteClick will generate errors at compile time if inlined
@@ -71,11 +58,14 @@ inline fun ItemCard(
     val rotation = transition.animateFloat(label = "") { if (!it) 0f else 180f }
 
     Card(
-        backgroundColor = MaterialTheme.colors.background,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         modifier = modifier
     ) {
         Surface(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
-            Column(modifier = Modifier.animateContentSize()
+            Column(modifier = Modifier
+                .animateContentSize()
                 .fillMaxWidth()) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -85,10 +75,11 @@ inline fun ItemCard(
                     Column(modifier = Modifier.weight(1.0f, true)) {
                         exposedText()
                     }
-                    Column(modifier = Modifier.weight(0.375f, false)) {
+                    Column(modifier = Modifier.weight(0.35f, true)) {
                         Row(
                             horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             IconButton(onClick = { showActionMenu = !showActionMenu }) {
                                 Icon(
@@ -107,33 +98,37 @@ inline fun ItemCard(
                             }
                             DropdownMenu(
                                 expanded = showActionMenu,
-                                onDismissRequest = { showActionMenu = false }
+                                onDismissRequest = { showActionMenu = false },
+                                modifier = Modifier.padding(vertical = 0.dp)
                             ) {
-                                DropdownMenuItem(onClick = {
-                                    showActionMenu = false
-                                    onChangeStatusClick()
-                                }) {
-                                    Icon(imageVector = Icons.Outlined.Check, contentDescription = null)
-                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                                    Text(stringResource(R.string.change_status_button))
-                                }
-                                DropdownMenuItem(onClick = {
-                                    showActionMenu = false
-                                    onEditClick()
-                                }) {
-                                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
-                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                                    Text(stringResource(R.string.edit_button))
-                                }
+                                DropdownMenuItem(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    leadingIcon = { Icon(imageVector = Icons.Outlined.Check, contentDescription = null) },
+                                    text = { Text(stringResource(R.string.change_status_button)) },
+                                    onClick = {
+                                        showActionMenu = false
+                                        onChangeStatusClick()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    leadingIcon = { Icon(imageVector = Icons.Outlined.Edit, contentDescription = null) },
+                                    text = { Text(stringResource(R.string.edit_button)) },
+                                    onClick = {
+                                        showActionMenu = false
+                                        onEditClick()
+                                    }
+                                )
                                 Divider()
-                                DropdownMenuItem(onClick = {
-                                    showActionMenu = false
-                                    onDeleteClick()
-                                }) {
-                                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = null, tint = Color.Red)
-                                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                                    Text(text = stringResource(R.string.card_delete_item), color = Color.Red)
-                                }
+                                DropdownMenuItem(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    leadingIcon = { Icon(imageVector = Icons.Outlined.Delete, contentDescription = null) },
+                                    text = { Text(text = stringResource(R.string.card_delete_item), color = Color.Red) },
+                                    onClick = {
+                                        showActionMenu = false
+                                        onDeleteClick()
+                                    }
+                                )
                             }
                         }
                     }
@@ -177,8 +172,8 @@ fun ActionsFab(
         }
         FloatingActionButton(
             onClick = { isClicked.value = !isClicked.value },
-            backgroundColor = MaterialTheme.colors.primary,
-            contentColor = MaterialTheme.colors.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Icon(
                 imageVector = icon,
@@ -187,6 +182,61 @@ fun ActionsFab(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> FormTextField(
+    element: FormElement<T>,
+    onValueChange: (String) -> Unit,
+    label: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    shape: Shape = LookAndFeel.FieldShape
+) {
+    TextField(
+        value = element.value.toString(),
+        onValueChange = onValueChange,
+        isError = element.hasErrors(),
+        label = label,
+        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        colors = TextFieldDefaults.textFieldColors(
+            disabledIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BacklogTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    label: @Composable () -> Unit,
+    shape: Shape = LookAndFeel.FieldShape,
+    interactionSource: MutableInteractionSource = MutableInteractionSource(),
+    readOnly: Boolean = false,
+    singleLine: Boolean = false
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        isError = isError,
+        label = label,
+        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        colors = TextFieldDefaults.textFieldColors(
+            disabledIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        interactionSource = interactionSource,
+        readOnly = readOnly,
+        singleLine = singleLine
+    )
 }
 
 @Composable
@@ -204,12 +254,15 @@ inline fun <reified T : Enum<T>> StatusMenu(
         modifier = modifier
     ) {
         enumValues<T>().forEach { status ->
-            DropdownMenuItem(onClick = { onSelect(status) }) {
-                Text(
-                    text = stringResource(toResource(status)),
-                    color = toColor(status)
-                )
-            }
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(toResource(status)),
+                        color = toColor(status)
+                    )
+                },
+                onClick = { onSelect(status) }
+            )
         }
     }
 }

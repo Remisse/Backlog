@@ -1,11 +1,8 @@
 package com.github.backlog.ui.components
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,11 +48,12 @@ fun CancelDialogContent(
 ) {
     Column(
         verticalArrangement = LookAndFeel.DialogVerticalArrangement,
-        horizontalAlignment = LookAndFeel.DialogHorizontalAlignment
+        horizontalAlignment = LookAndFeel.DialogHorizontalAlignment,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
             text = stringResource(heading),
-            style = MaterialTheme.typography.h6.plus(TextStyle(fontWeight = FontWeight.Bold)),
+            style = MaterialTheme.typography.headlineSmall.plus(TextStyle(fontWeight = FontWeight.Bold)),
             modifier = modifier
         )
         Text(
@@ -68,10 +66,11 @@ fun CancelDialogContent(
             modifier = modifier
         ) {
             TextButton(onClick = onStayButtonClick) {
-                Text(stringResource(stayRes).uppercase())
+                Text(stringResource(stayRes))
             }
+            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
             Button(onClick = onSubmitButtonClick) {
-                Text(stringResource(returnRes).uppercase())
+                Text(stringResource(returnRes))
             }
         }
     }
@@ -91,25 +90,27 @@ fun DeleteDialog(
         Surface(shape = LookAndFeel.DialogSurfaceShape) {
             Column(
                 verticalArrangement = LookAndFeel.DialogVerticalArrangement,
-                horizontalAlignment = LookAndFeel.DialogHorizontalAlignment
+                horizontalAlignment = LookAndFeel.DialogHorizontalAlignment,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
                     text = stringResource(R.string.dialog_warning_heading),
-                    style = MaterialTheme.typography.h6
+                    style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
                     text = stringResource(body),
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Row(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(onClick = onCancelClick) {
-                        Text(stringResource(R.string.insert_button_cancel).uppercase())
+                        Text(stringResource(R.string.insert_button_cancel))
                     }
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                     Button(onClick = onConfirmDeleteClick) {
-                        Text(stringResource(R.string.card_delete_item).uppercase())
+                        Text(stringResource(R.string.card_delete_item))
                     }
                 }
             }

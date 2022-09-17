@@ -4,7 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Help
@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.github.backlog.R
+import com.github.backlog.ui.components.BacklogTextField
+import com.github.backlog.ui.components.LookAndFeel
 import com.github.backlog.ui.components.TextLabel
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class,)
 @Composable
 fun SteamDialogContent(
     heading: String,
@@ -44,9 +46,12 @@ fun SteamDialogContent(
             usePlatformDefaultWidth = false
         )
     ) {
-        Surface(modifier = Modifier
-            .animateContentSize()
-            .padding(horizontal = 16.dp)) {
+        Surface(
+            modifier = Modifier
+                .animateContentSize()
+                .padding(horizontal = 16.dp),
+            shape = LookAndFeel.DialogSurfaceShape
+        ) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -55,24 +60,28 @@ fun SteamDialogContent(
             ) {
                 Text(
                     text = heading,
-                    style = MaterialTheme.typography.h6
+                    style = MaterialTheme.typography.headlineSmall
                 )
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
                 Text(
                     text = stringResource(R.string.steam_dialog_disclaimer),
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.padding(vertical = 2.dp))
-                TextField(
+                BacklogTextField(
                     value = steamId,
                     onValueChange = { steamId = it },
                     label = { Text(stringResource(R.string.steam_id_field)) },
                     singleLine = true
                 )
-                Button(
-                    onClick = { onConfirmClick(steamId) }
-                ) {
-                    Text(stringResource(R.string.button_confirm).uppercase())
+                Row() {
+                    Button(onClick = { onConfirmClick(steamId) }) {
+                        Text(stringResource(R.string.button_confirm))
+                    }
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                    OutlinedButton(onClick = onDismissRequest) {
+                        Text(stringResource(R.string.insert_button_cancel))
+                    }
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -86,7 +95,9 @@ fun SteamDialogContent(
                     )
                     IconButton(
                         onClick = { isInfoExpanded = !isInfoExpanded },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.End)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ExpandMore,

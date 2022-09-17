@@ -19,14 +19,14 @@ sealed class LookAndFeel {
         val FieldColumnHorizontalAlignment = Alignment.CenterHorizontally
 
         val FieldModifier = Modifier.fillMaxWidth()
-        val FieldShape = RoundedCornerShape(4.dp)
+        val FieldShape = RoundedCornerShape(16.dp)
 
         val TextFieldTitleModifier = Modifier.fillMaxWidth()
             .padding(vertical = 4.dp)
         val TextValueModifier = Modifier.fillMaxWidth()
             .padding(horizontal = 16.dp)
 
-        val DialogSurfaceShape = RoundedCornerShape(4.dp)
+        val DialogSurfaceShape = RoundedCornerShape(16.dp)
         val DialogVerticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         val DialogHorizontalAlignment = Alignment.Start
 

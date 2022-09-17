@@ -3,7 +3,7 @@ package com.github.backlog.ui.screen.secondary.steam
 import android.os.Bundle
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +45,7 @@ class SteamImportScreen(
             ) {
                 Text(
                     text = stringResource(R.string.steam_library_wait),
-                    color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))

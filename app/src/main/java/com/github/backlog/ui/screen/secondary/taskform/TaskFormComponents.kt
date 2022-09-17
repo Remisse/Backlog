@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -90,10 +89,15 @@ private fun GameSelectionDialogWithSearch(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskFormContent(onSubmitClick: (TaskFormState) -> Unit, onCancelDialogSubmit: () -> Unit,
-                    state: TaskFormState, @StringRes topBarTitle: Int, @StringRes submitButton: Int,
-                    gameViewModel: GameViewModel
+fun TaskFormContent(
+    onSubmitClick: (TaskFormState) -> Unit,
+    onCancelDialogSubmit: () -> Unit,
+    state: TaskFormState,
+    @StringRes topBarTitle: Int,
+    @StringRes submitButton: Int,
+    gameViewModel: GameViewModel
 ) {
     val format = LookAndFeel.dateFormat(Locale.getDefault())
 
@@ -151,37 +155,31 @@ fun TaskFormContent(onSubmitClick: (TaskFormState) -> Unit, onCancelDialogSubmit
         modifier = LookAndFeel.FieldColumnModifier,
         verticalArrangement = LookAndFeel.FieldColumnVerticalArrangement
     ) {
-        TextField(
+        BacklogTextField(
             value = state.gameAndPlatform,
             onValueChange = {},
             label = { Text(stringResource(R.string.task_field_game)) },
-            modifier = LookAndFeel.FieldModifier,
-            shape = LookAndFeel.FieldShape,
             interactionSource = gameSelectionInteractionSource,
             readOnly = true
         )
-        TextField(
+        BacklogTextField(
             value = state.description.value,
             onValueChange = { state.description.value = it },
             label = { Text(stringResource(R.string.task_field_description)) },
-            modifier = LookAndFeel.FieldModifier,
-            shape = LookAndFeel.FieldShape,
             isError = state.description.hasErrors()
         )
-        TextField(
+        BacklogTextField(
             value = if (state.deadline.value != null) format.format(state.deadline.value) else "",
             onValueChange = {},
             label = { Text(stringResource(R.string.task_field_deadline_date)) },
             readOnly = true,
-            modifier = LookAndFeel.FieldModifier,
-            interactionSource = dateInteractionSource,
-            shape = LookAndFeel.FieldShape
+            interactionSource = dateInteractionSource
         )
         Button(
             modifier = LookAndFeel.FieldModifier,
             onClick = { onSubmitClick(state) }
         ) {
-            Text(stringResource(submitButton).uppercase())
+            Text(text = stringResource(submitButton), style = MaterialTheme.typography.labelLarge)
         }
     }
 }

@@ -123,5 +123,17 @@
     <string name="steam_dialog_help_1">1. Log into your Steam account from the Steam desktop application</string>
     <string name="steam_dialog_help_2">2. Navigate to your Profile page</string>
     <string name="steam_dialog_help_3">3. Right-click anywhere on the page, then choose \"View source\"</string>
-    <string name="steam_dialog_help_4">4. Search for \"g_steamID\", then copy its value inside the text field above</string>
+    <string name="steam_dialog_help_4">4. Search for \"g_steamID\", then copy its value into the text field above</string>
+    <string name="profile_name_field">Name</string>
+    <string name="alt_profile_edit_name">Edit name</string>
+    <string name="alt_profile_save_name">Save name</string>
+    <string name="profile_bio_field">Bio</string>
+    <string name="alt_profile_edit_bio">Edit bio</string>
+    <string name="alt_profile_save_bio">Save bio</string>
+    <string name="profile_tab_profile">Profile</string>
+    <string name="profile_tab_stats">Stats</string>
+    <string name="change_status_heading">Change status</string>
+    <string name="game_deleted_success_toast">Game deleted.</string>
+    <string name="game_delete_dialog_heading">Delete game</string>
+    <string name="task_delete_dialog_heading">Delete task</string>
 </resources>

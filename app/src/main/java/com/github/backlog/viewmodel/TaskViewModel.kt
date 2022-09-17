@@ -40,6 +40,7 @@ class TaskViewModel(
 
     private var workerId: UUID? = null
 
+    // TODO Refactor this crap
     @SuppressLint("RestrictedApi")
     private val observer = Observer<WorkInfo> {
         viewModelScope.launch {
@@ -55,7 +56,6 @@ class TaskViewModel(
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                             .setAutoCancel(true)
 
-                            // TODO Delete this crap
                         with(NotificationManagerCompat.from(notificationBuilder.mContext)) {
                             notify(task.task.uid, builder.build())
                         }

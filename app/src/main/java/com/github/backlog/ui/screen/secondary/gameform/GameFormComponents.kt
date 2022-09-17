@@ -8,13 +8,14 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +30,7 @@ import com.github.backlog.ui.state.form.GameFormState
 import java.time.LocalDate
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FieldStatusMenu(
     value: GameStatus,
@@ -60,7 +62,12 @@ private fun FieldStatusMenu(
             },
             modifier = LookAndFeel.FieldModifier,
             readOnly = true,
-            shape = LookAndFeel.FieldShape
+            shape = LookAndFeel.FieldShape,
+            colors = TextFieldDefaults.textFieldColors(
+                disabledIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            )
         )
         StatusMenu<GameStatus>(
             expanded = isExpanded,
@@ -75,24 +82,7 @@ private fun FieldStatusMenu(
     }
 }
 
-@Composable
-private fun <T> FormTextField(
-    element: FormElement<T>,
-    onValueChange: (String) -> Unit,
-    label: @Composable () -> Unit,
-    modifier: Modifier = LookAndFeel.FieldModifier,
-    shape: Shape = LookAndFeel.FieldShape
-) {
-    TextField(
-        value = element.value.toString(),
-        onValueChange = onValueChange,
-        isError = element.hasErrors(),
-        label = label,
-        modifier = modifier,
-        shape = shape
-    )
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameFormContent(
     state: GameFormState,
@@ -146,7 +136,7 @@ fun GameFormContent(
         Text(
             text = stringResource(R.string.required_fields_heading),
             textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.headlineSmall
         )
         FormTextField(
             element = state.title,
@@ -156,7 +146,7 @@ fun GameFormContent(
         Text(
             text = stringResource(R.string.optional_fields_heading),
             textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.headlineSmall,
             modifier = LookAndFeel.TextFieldTitleModifier
         )
         FormTextField(
@@ -188,7 +178,12 @@ fun GameFormContent(
                 readOnly = true,
                 modifier = LookAndFeel.FieldModifier.weight(.5f),
                 interactionSource = dateInteractionSource,
-                shape = LookAndFeel.FieldShape
+                shape = LookAndFeel.FieldShape,
+                colors = TextFieldDefaults.textFieldColors(
+                    disabledIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
             )
         }
         FormTextField(
@@ -221,7 +216,7 @@ fun GameFormContent(
         }
 
         Button(modifier = Modifier.fillMaxWidth(), onClick = onCommitButtonClick) {
-            Text(stringResource(button).uppercase())
+            Text(text = stringResource(button), style = MaterialTheme.typography.labelLarge)
         }
     }
 }

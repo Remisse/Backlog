@@ -1,47 +1,47 @@
 package com.github.backlog.ui.screen.main.library
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.github.backlog.R
-import com.github.backlog.model.GameStatus
 import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.ui.components.*
 import com.github.backlog.ui.state.filter.GameFilterState
 import com.github.backlog.utils.localDateFromEpochSecond
-import com.github.backlog.utils.now
-import com.github.backlog.viewmodel.GameViewModel
-import java.time.Clock
-import java.time.Instant
+import compose.icons.FontAwesomeIcons
+import compose.icons.TablerIcons
+import compose.icons.fontawesomeicons.Brands
+import compose.icons.fontawesomeicons.brands.Steam
+import compose.icons.tablericons.LetterR
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Composable
 private fun ItemCardList(
     games: List<Game>,
     onEditClick: (Int) -> Unit,
-    onDeleteClick: (Game) -> Unit,
+    onDeleteClick: (Int) -> Unit,
     onChangeStatusClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -50,19 +50,19 @@ private fun ItemCardList(
     LazyColumn(modifier = modifier.animateContentSize()) {
         items(games) { game ->
             ItemCard(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 exposedText = {
                     Column(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = stringResource(game.status.toResource()).uppercase(),
+                            text = stringResource(game.status.toResource()),
                             color = game.status.toColor(),
-                            style = MaterialTheme.typography.caption
+                            style = MaterialTheme.typography.labelLarge
                         )
                         Text(
                             text = game.title,
-                            style = MaterialTheme.typography.subtitle2
+                            style = MaterialTheme.typography.titleSmall
                         )
                         Spacer(modifier = Modifier.padding(vertical = 2.dp))
                     }
@@ -81,54 +81,87 @@ private fun ItemCardList(
                         fields.forEach { entry ->
                            entry.key.takeIf { it != null && it != "" }
                                 ?.let {
-                                    CardSubtitleTextLabel(
-                                        text = it,
-                                        label = { Text(
-                                            text = stringResource(entry.value),
-                                            style = MaterialTheme.typography.caption,
-                                            color = MaterialTheme.colors.secondary
-                                        ) }
+                                    TextLabel(
+                                        text = {
+                                           Text(
+                                               text = it,
+                                               style = MaterialTheme.typography.bodyMedium,
+                                               modifier = Modifier.alpha(.75f)
+                                           )
+                                        },
+                                        label = {
+                                            Text(
+                                                text = stringResource(entry.value),
+                                                style = MaterialTheme.typography.labelMedium,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+                                        }
                                     )
                                 }
                         }
                         game.completionDate?.let {
-                            CardSubtitleTextLabel(
-                                text = format.format(localDateFromEpochSecond(it)),
-                                label = { Text(
-                                    text = stringResource(R.string.game_form_completion_date_label),
-                                    style = MaterialTheme.typography.caption,
-                                    color = MaterialTheme.colors.secondary
-                                ) }
+                            TextLabel(
+                                text = {
+                                    Text(
+                                        text = format.format(localDateFromEpochSecond(it)),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.alpha(.75f)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = stringResource(R.string.game_form_completion_date_label),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
                             )
                         }
                     }
                 },
                 onChangeStatusClick = { onChangeStatusClick(game.uid) },
                 onEditClick = { onEditClick(game.uid) },
-                onDeleteClick = { onDeleteClick(game) }
+                onDeleteClick = { onDeleteClick(game.uid) }
             )
         }
     }
 }
 
 @Composable
-private fun SubFab(
+private fun SubButton(
     text: String,
     onClick: () -> Unit,
     imageVector: ImageVector,
+    iconSize: Dp = Dp.Unspecified,
     contentDescription: String
 ) {
-    ExtendedFloatingActionButton(
-        text = { Text(text = text, fontSize = 9.sp, color = MaterialTheme.colors.onPrimary) },
-        onClick = onClick,
-        icon = { Icon(
-            imageVector = imageVector,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(16.dp)
-        ) },
-        modifier = Modifier.height(36.dp),
-        backgroundColor = MaterialTheme.colors.primary
-    )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            )
+        }
+        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+        FilledIconButton(
+            onClick = onClick,
+            shape = MaterialTheme.shapes.medium,
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Icon(
+                imageVector = imageVector,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(iconSize)
+            )
+        }
+    }
 }
 
 @Composable
@@ -142,23 +175,24 @@ fun BacklogFab(
         icon = Icons.Default.Add,
         modifier = modifier
     ) {
-        SubFab(
-            text = stringResource(R.string.backlog_fab_create).uppercase(),
+        SubButton(
+            text = stringResource(R.string.backlog_fab_create),
             onClick = onCreateButtonClick,
             imageVector = Icons.Default.Create,
             contentDescription = ""
         )
-        SubFab(
-            text = stringResource(R.string.online_search_title).uppercase(),
+        SubButton(
+            text = stringResource(R.string.online_search_title),
             onClick = onOnlineSearchButtonClick,
-            imageVector = Icons.Default.Public,
+            imageVector = TablerIcons.LetterR,
             contentDescription = ""
         )
-        SubFab(
-            text = stringResource(R.string.steam_import_title).uppercase(),
+        SubButton(
+            text = stringResource(R.string.steam_import_title),
             onClick = onSteamImportClick,
-            imageVector = Icons.Default.LibraryBooks,
-            contentDescription = ""
+            imageVector = FontAwesomeIcons.Brands.Steam,
+            contentDescription = "",
+            iconSize = 22.dp
         )
     }
 }
@@ -177,8 +211,16 @@ private fun FilterDialog(state: GameFilterState) {
                     .padding(8.dp)
                     .fillMaxWidth()
             ) {
-                Text(text = stringResource(R.string.filters_heading), style = MaterialTheme.typography.h6)
-                Text(text = stringResource(R.string.insert_status_label), style = MaterialTheme.typography.subtitle1)
+                Text(
+                    text = stringResource(R.string.filters_heading),
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+                Text(
+                    text = stringResource(R.string.insert_status_label),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
                 Column() {
                     state.statusFilters.forEach {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -196,10 +238,7 @@ private fun FilterDialog(state: GameFilterState) {
 }
 
 @Composable
-inline fun BacklogTopBarExtra(
-    crossinline onSearchClick: (String) -> Unit,
-    noinline onFilterClick: () -> Unit
-) {
+fun BacklogTopBarExtra(filterState: GameFilterState) {
     var searchValue by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
 
@@ -208,16 +247,17 @@ inline fun BacklogTopBarExtra(
             value = searchValue,
             onValueChange = { searchValue = it } ,
             onSearchClick = {
-                onSearchClick(searchValue)
-
+                filterState.titleFilter.value = searchValue
                 expanded = false
-            }
+            },
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth(.8f)
         )
         IconButton(
             onClick = {
                 searchValue = ""
-                onSearchClick(searchValue)
-
+                filterState.titleFilter.value = searchValue
                 expanded = false
             }
         ) {
@@ -229,7 +269,7 @@ inline fun BacklogTopBarExtra(
             IconButton(
                 onClick = {
                     searchValue = ""
-                    onSearchClick(searchValue)
+                    filterState.titleFilter.value = searchValue
                 }
             ) {
                 Icon(imageVector = Icons.Default.Cancel, contentDescription = "Clear search")
@@ -238,66 +278,27 @@ inline fun BacklogTopBarExtra(
         IconButton(onClick = { expanded = true }) {
             Icon(imageVector = Icons.Outlined.Search, contentDescription = "Search")
         }
-        IconButton(onClick = onFilterClick) {
+        IconButton(onClick = { filterState.shouldShowFilters = true }) {
             Icon(imageVector = Icons.Outlined.FilterList, contentDescription = "Filters")
         }
     }
 }
 
-// TODO Pass VM logic as lambdas
 @Composable
 fun BacklogScreen(
     onEditCardClick: (Int) -> Unit,
-    gameViewModel: GameViewModel
+    onStatusChangeClick: (Int) -> Unit,
+    onDeleteClick: (Int) -> Unit,
+    backlog: Flow<List<Game>>,
+    filterState: GameFilterState
 ) {
-    val gameUidStatusUpdate: MutableState<Int?> = remember { mutableStateOf(null) }
-    val resetChangeState = { gameUidStatusUpdate.value = null }
-
-    val gameUidToDelete: MutableState<Int?> = remember { mutableStateOf(null) }
-    val resetDelete = { gameUidToDelete.value = null }
-    val failureToast = Toast.makeText(LocalContext.current, stringResource(R.string.delete_failure_toast), Toast.LENGTH_SHORT)
-
-    if (gameUidToDelete.value != null) {
-        DeleteDialog(
-            onDismissRequest = resetDelete,
-            onConfirmDeleteClick = {
-                gameViewModel.delete(
-                    gameUidToDelete.value!!,
-                    onSuccess = resetDelete,
-                    onFailure = {
-                        resetDelete()
-                        failureToast.show()
-                    }
-                )
-            },
-            onCancelClick = resetDelete,
-            body = R.string.game_delete_dialog_body
-        )
-    }
-    if (gameUidStatusUpdate.value != null) {
-        Surface(shape = LookAndFeel.DialogSurfaceShape, modifier = Modifier.padding(16.dp)) {
-            StatusMenu<GameStatus>(
-                expanded = gameUidStatusUpdate.value != null,
-                onSelect = {
-                    gameViewModel.setStatus(gameUidStatusUpdate.value!!, it)
-                    if (it == GameStatus.COMPLETED) {
-                        gameViewModel.setCompletionDate(gameUidStatusUpdate.value!!, now())
-                    }
-                    resetChangeState()
-                },
-                onDismissRequest = resetChangeState,
-                toColor = { it.toColor() },
-                toResource = { it.toResource() }
-            )
-        }
-    }
-    if (gameViewModel.filterState.shouldShowFilters) {
-        FilterDialog(gameViewModel.filterState)
+    if (filterState.shouldShowFilters) {
+        FilterDialog(filterState)
     }
 
-    gameViewModel.backlog
-        .collectAsState(initial = listOf()).value
-        .filter { gameViewModel.filterState.testAll(it) }
+    backlog.collectAsState(initial = emptyList())
+        .value
+        .filter { filterState.testAll(it) }
         .apply {
             if (this.isEmpty()) {
                 Column(
@@ -307,16 +308,16 @@ fun BacklogScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.backlog_empty),
-                        color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         textAlign = TextAlign.Center
                     )
                 }
             } else {
                 ItemCardList(
                     games = this,
-                    onChangeStatusClick = { gameUidStatusUpdate.value = it },
+                    onChangeStatusClick = onStatusChangeClick,
                     onEditClick = onEditCardClick,
-                    onDeleteClick = { gameUidToDelete.value = it.uid }
+                    onDeleteClick = onDeleteClick
                 )
             }
         }

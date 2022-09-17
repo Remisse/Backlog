@@ -1,7 +1,6 @@
 package com.github.backlog.ui.screen.main.profile
 
 import android.os.Bundle
-import androidx.compose.material.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.github.backlog.Section
@@ -9,9 +8,8 @@ import com.github.backlog.ui.screen.main.MainScreen
 import com.github.backlog.utils.ViewModelFactoryStore
 
 class ProfileScreen(
-    drawerState: DrawerState,
     vmFactories: ViewModelFactoryStore
-) : MainScreen(drawerState, vmFactories) {
+) : MainScreen(vmFactories) {
 
     override val section: Section = Section.Profile
 

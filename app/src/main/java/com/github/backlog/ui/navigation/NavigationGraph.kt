@@ -6,30 +6,25 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.*
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
+import com.github.backlog.Section
 import com.github.backlog.ui.screen.BacklogScreen
-import com.github.backlog.ui.components.MainDrawer
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 
 private const val ROOT = "main"
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationRoot(navState: NavigationState) {
     Scaffold(
-        drawerBackgroundColor = MaterialTheme.colors.surface,
-        drawerContentColor = MaterialTheme.colors.onSurface,
-        drawerScrimColor = MaterialTheme.colors.background,
-        drawerContent = { MainDrawer() },
-        scaffoldState = navState.scaffoldState,
         topBar = {
             navState.currentScreen()
                 .TopBar()
@@ -47,7 +42,7 @@ fun NavigationRoot(navState: NavigationState) {
             navController = navState.navController,
             startDestination = ROOT,
             modifier = Modifier.padding(padding),
-            contentAlignment = Alignment.TopCenter // Removing this will make animations look weird
+            contentAlignment = Alignment.TopStart // Removing this will make animations look weird
         ) {
             mainGraph(navState)
 
@@ -64,6 +59,10 @@ fun NavigationRoot(navState: NavigationState) {
                     screen.Content(null)
                 }
             }
+
+            navState.dialogsWithArgument.forEach { (screen, pair) ->
+                dialogWithNonNullArgumentGraph(screen, pair.first, pair.second)
+            }
         }
     }
 }
@@ -72,7 +71,7 @@ fun NavigationRoot(navState: NavigationState) {
 private fun NavGraphBuilder.mainGraph(appState: NavigationState) {
     navigation(
         route = ROOT,
-        startDestination = appState.startingScreen.section.route
+        startDestination = START_ROUTE
     ) {
         appState.mainScreens.forEach { screen ->
             composable(
@@ -108,6 +107,19 @@ private fun NavGraphBuilder.secondaryWithNonNullArgumentGraph(
         arguments = listOf(navArgument(argKey) { type = argType }),
         enterTransition = { slideInVertically { it } },
         exitTransition = { slideOutVertically { -it } }
+    ) { from ->
+        screen.Content(Bundle(from.arguments))
+    }
+}
+
+private fun NavGraphBuilder.dialogWithNonNullArgumentGraph(
+    screen: BacklogScreen,
+    argKey: String,
+    argType: NavType<*>
+) {
+    dialog(
+        route = "${screen.section.route}/{$argKey}",
+        arguments = listOf(navArgument(argKey) { type = argType })
     ) { from ->
         screen.Content(Bundle(from.arguments))
     }

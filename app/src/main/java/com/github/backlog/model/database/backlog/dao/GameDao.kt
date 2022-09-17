@@ -79,6 +79,7 @@ interface GameDao {
     @Query("SELECT COUNT(*) " +
             "FROM Game " +
             "WHERE Game.completion_date IS NOT NULL " +
+            "AND status = 'COMPLETED' " +
             "AND Game.completion_date >= CAST(strftime('%s','now','start of year','localtime') AS INTEGER) " +
             "AND Game.completion_date < CAST(strftime('%s','now','+1 year','start of year','localtime') AS INTEGER) ")
     fun completedGamesInCurrentYear(): Flow<Int>

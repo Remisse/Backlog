@@ -12,23 +12,12 @@ import com.github.backlog.ui.theme.BacklogTheme
 import com.github.backlog.utils.ViewModelFactoryStore
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var vmFactories: ViewModelFactoryStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Create the NotificationChannel
-        val name = "task channel"
-        val descriptionText = ""
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-            description = descriptionText
-        }
-        // Register the channel with the system
-        val notificationManager: NotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+        createNotificationChannel()
 
         vmFactories = (application as BacklogApplication).viewModelFactoryStore
 
@@ -38,4 +27,17 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+private fun MainActivity.createNotificationChannel() {
+    val name = "task channel"
+    val descriptionText = ""
+    val importance = NotificationManager.IMPORTANCE_DEFAULT
+    val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+        description = descriptionText
+    }
+    // Register the channel with the system
+    val notificationManager: NotificationManager =
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.createNotificationChannel(channel)
 }

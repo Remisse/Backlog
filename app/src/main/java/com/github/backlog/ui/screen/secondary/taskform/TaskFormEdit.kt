@@ -16,9 +16,10 @@ import com.github.backlog.viewmodel.GameViewModel
 import com.github.backlog.viewmodel.TaskViewModel
 import kotlinx.coroutines.launch
 
-class TaskFormEdit(private val onDialogSubmitClick: () -> Unit,
-                   private val onSuccess: () -> Unit,
-                   vmFactories: ViewModelFactoryStore
+class TaskFormEdit(
+    private val onDialogSubmitClick: () -> Unit,
+    private val onSuccess: () -> Unit,
+    vmFactories: ViewModelFactoryStore
 ) : BaseTaskForm(vmFactories) {
 
     override val section: Section = Section.TaskEdit

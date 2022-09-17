@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class GameViewModel(private val dao: GameDao) : ViewModel() {
-    // TODO Move these to the BacklogScreen implementations that need them
     val formState: GameFormState = GameFormState()
     val filterState: GameFilterState = GameFilterState()
 

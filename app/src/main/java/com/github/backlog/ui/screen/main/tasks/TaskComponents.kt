@@ -5,12 +5,13 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -49,28 +50,46 @@ private fun TaskList(
                         modifier = Modifier.padding(vertical = 6.dp)
                     ) {
                         Text(
-                            text = stringResource(item.task.status.toResource()).uppercase(),
-                            style = MaterialTheme.typography.caption,
+                            text = stringResource(item.task.status.toResource()),
+                            style = MaterialTheme.typography.labelSmall,
                             color = item.task.status.toColor()
                         )
-                        Text(text = item.task.description, style = MaterialTheme.typography.subtitle2)
+                        Text(text = item.task.description, style = MaterialTheme.typography.labelMedium)
                         Spacer(modifier = Modifier.padding(vertical = 2.dp))
-                        CardSubtitleTextLabel(
-                            text = item.gameTitle,
-                            label = { Text(
-                                text = stringResource(R.string.task_field_game),
-                                style = MaterialTheme.typography.caption,
-                                color = MaterialTheme.colors.secondary
-                            ) },
+                        TextLabel(
+                            text = {
+                                Text(
+                                    text = item.gameTitle,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.alpha(.75f)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.task_field_game),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            },
                         )
-                        item.task.deadline?.let { CardSubtitleTextLabel(
-                            text = format.format(localDateFromEpochSecond(it)),
-                            label = { Text(
-                                text = stringResource(R.string.task_card_icon_deadline),
-                                style = MaterialTheme.typography.caption,
-                                color = MaterialTheme.colors.secondary
-                            ) }
-                        ) }
+                        item.task.deadline?.let {
+                            TextLabel(
+                                text = {
+                                    Text(
+                                        text= format.format(localDateFromEpochSecond(it)),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.alpha(.75f)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = stringResource(R.string.task_card_icon_deadline),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            )
+                        }
                     }
                 },
                 hiddenText = null,
@@ -87,8 +106,8 @@ fun TaskFab(modifier: Modifier = Modifier, onCreateClick: () -> Unit) {
     FloatingActionButton(
         onClick = onCreateClick,
         modifier = modifier,
-        backgroundColor = MaterialTheme.colors.primary,
-        contentColor = MaterialTheme.colors.onPrimary
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
     ) {
         Icon(imageVector = Icons.Outlined.Add, contentDescription = null)
     }
@@ -150,7 +169,7 @@ fun TaskScreenContent(
                 ) {
                     Text(
                         text = stringResource(R.string.tasks_empty),
-                        color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         textAlign = TextAlign.Center
                     )
                 }

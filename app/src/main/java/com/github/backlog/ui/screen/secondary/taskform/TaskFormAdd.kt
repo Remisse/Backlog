@@ -11,11 +11,11 @@ import com.github.backlog.utils.ViewModelFactoryStore
 import com.github.backlog.viewmodel.GameViewModel
 import com.github.backlog.viewmodel.TaskViewModel
 
-class TaskFormAdd(private val onDialogSubmitClick: () -> Unit,
-                  private val onSuccess: () -> Unit,
-                  vmFactories: ViewModelFactoryStore
+class TaskFormAdd(
+    private val onDialogSubmitClick: () -> Unit,
+    private val onSuccess: () -> Unit,
+    vmFactories: ViewModelFactoryStore
 ) : BaseTaskForm(vmFactories) {
-
     override val section: Section = Section.TaskAdd
 
     @Composable

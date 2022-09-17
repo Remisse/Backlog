@@ -3,7 +3,7 @@ package com.github.backlog.ui.screen.secondary.onlinesearch
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -33,21 +33,18 @@ fun TopSearchBar(
     onBackClick: () -> Unit,
     onSearchSubmit: () -> Unit
 ) {
-    TopAppBar {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
-            }
-            SearchBar(
-                value = searchValue,
-                onValueChange = onValueChange,
-                onSearchClick = onSearchSubmit,
-                modifier = LookAndFeel.FieldModifier.height(40.dp)
-            )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = onBackClick) {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
         }
+        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+        SearchBar(
+            value = searchValue,
+            onValueChange = onValueChange,
+            onSearchClick = onSearchSubmit,
+            modifier = Modifier.fillMaxWidth(.95f)
+                .padding(vertical = 4.dp)
+        )
     }
 }
 
@@ -62,8 +59,8 @@ private fun ResultList(
                 onClick = { onGameClick(item) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.surface,
-                    contentColor = MaterialTheme.colors.primary
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
@@ -92,7 +89,7 @@ fun OnlineSearchContent(
         ) {
             Text(
                 text = stringResource(R.string.online_search_empty),
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 textAlign = TextAlign.Center
             )
         }
@@ -107,7 +104,7 @@ fun OnlineSearchContent(
             ) {
                 Text(
                     text = stringResource(R.string.online_search_performed_wait),
-                    color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))

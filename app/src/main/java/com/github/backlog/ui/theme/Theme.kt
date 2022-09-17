@@ -1,25 +1,26 @@
 package com.github.backlog.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 /* Color palettes */
-private val DarkColorPalette = darkColors(
+private val DarkColorPalette = darkColorScheme(
     primary = Teal1,
-    primaryVariant = Blue1,
-    secondary = LightGreen
+    secondary = LightGreen,
+    tertiary = Blue1
 )
 
-private val LightColorPalette = lightColors(
+private val LightColorPalette = lightColorScheme(
     primary = Teal1,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    secondary = Teal200,
+    tertiary = Purple700
 
     /* Other default colors to override
     background = Color.White,
@@ -43,9 +44,7 @@ fun BacklogTheme(
     }
 
     MaterialTheme(
-        colors = colors,
-        typography = Typography,
-        shapes = Shapes,
+        colorScheme = colors,
         content = content
     )
 

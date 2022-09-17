@@ -1,6 +1,5 @@
 package com.github.backlog.ui.screen.main
 
-import androidx.compose.material.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -12,22 +11,15 @@ import com.github.backlog.ui.screen.BaseScreen
 import com.github.backlog.utils.ViewModelFactoryStore
 import kotlinx.coroutines.launch
 
-abstract class MainScreen(
-    private val drawerState: DrawerState,
-    vmFactories: ViewModelFactoryStore
-) : BaseScreen(vmFactories) {
+abstract class MainScreen(vmFactories: ViewModelFactoryStore) : BaseScreen(vmFactories) {
 
     @Composable
     protected abstract fun TopBarExtraButtons()
 
     @Composable
     override fun TopBar() {
-        val scope = rememberCoroutineScope()
         TopMenuBar(
             heading = section.resourceId,
-            onMenuButtonClick = {
-                scope.launch { drawerState.open() }
-            },
             modifier = Modifier,
             extra = { TopBarExtraButtons() }
         )

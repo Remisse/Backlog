@@ -1,7 +1,6 @@
 package com.github.backlog.ui.screen.main.tasks
 
 import android.os.Bundle
-import androidx.compose.material.DrawerState
 import androidx.compose.runtime.Composable
 import com.github.backlog.Section
 import com.github.backlog.ui.screen.main.MainScreen
@@ -10,9 +9,8 @@ import com.github.backlog.utils.ViewModelFactoryStore
 class TaskScreen(
     private val onTaskEditClick: (Int) -> Unit,
     private val onCreateClick: () -> Unit,
-    drawerState: DrawerState,
     vmFactories: ViewModelFactoryStore
-) : MainScreen(drawerState, vmFactories) {
+) : MainScreen(vmFactories) {
 
     override val section: Section = Section.Tasks
 

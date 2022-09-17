@@ -3,7 +3,7 @@ package com.github.backlog.ui.interop
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,8 +14,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.github.backlog.R
-import com.github.backlog.ui.theme.Blue1
-import com.github.backlog.ui.theme.YellowTetrad1
 
 @Composable
 private fun CustomDateTimeDialog(onDismissRequest: () -> Unit, content: @Composable () -> Unit) {
@@ -68,8 +66,8 @@ fun CalendarDialog(
                             enabled = year.value != null && month.value != null && dayOfMonth.value != null,
                             onClick = { onConfirmClick(year.value!!, month.value!!, dayOfMonth.value!!) },
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.primary,
-                                contentColor = MaterialTheme.colors.onPrimary
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             )
                         ) {
                             Text(stringResource(R.string.button_confirm).uppercase())
@@ -78,8 +76,8 @@ fun CalendarDialog(
                         Button(
                             onClick = { onConfirmClick(null, null, null) },
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.primaryVariant,
-                                contentColor = MaterialTheme.colors.onPrimary
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.onSecondary
                             )
                         ) {
                             Text(stringResource(R.string.card_delete_item).uppercase())

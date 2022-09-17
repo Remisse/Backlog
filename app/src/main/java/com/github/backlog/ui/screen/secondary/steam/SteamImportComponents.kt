@@ -3,7 +3,7 @@ package com.github.backlog.ui.screen.secondary.steam
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +31,7 @@ fun SteamImportContent(
     ) {
         Text(
             text = "${games.count()} ${stringResource(R.string.steam_import_count)}",
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.padding(4.dp))
         LazyColumn(
@@ -66,7 +66,7 @@ fun SteamImportContent(
             onClick = { onConfirmClick(selectedGames.value) },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.steam_import_add_selected).uppercase())
+            Text(stringResource(R.string.steam_import_add_selected))
         }
     }
 }

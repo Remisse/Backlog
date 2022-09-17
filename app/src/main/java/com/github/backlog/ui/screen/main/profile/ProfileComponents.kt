@@ -7,11 +7,9 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,6 +35,7 @@ import com.github.backlog.model.TaskStatus
 import com.github.backlog.model.database.backlog.entity.Game
 import com.github.backlog.model.database.backlog.queryentity.IntByString
 import com.github.backlog.model.database.backlog.queryentity.TaskWithGameTitle
+import com.github.backlog.ui.components.BacklogTextField
 import com.github.backlog.ui.components.LookAndFeel
 import com.github.backlog.ui.components.toColor
 import com.github.backlog.ui.components.toResource
@@ -74,134 +73,11 @@ private inline fun OutlinedSurface(
     }
 }
 
-private inline fun <reified T : Enum<T>> countOccurrences(data: List<T>): Map<T, Int> {
-    return enumValues<T>().associateBy(
-        keySelector = { status -> status },
-        valueTransform = { status ->
-            data.filter { it == status }
-                .size
-        }
-    )
-}
-
-@Composable
-private inline fun <reified T : Enum<T>> StatusPie(
-    data: Map<T, Int>,
-    title: String,
-    crossinline toColor: (T) -> Color,
-    crossinline toResource: (T) -> Int
-) {
-    OutlinedSurface(modifier = Modifier.fillMaxWidth()) {
-        Column() {
-            SectionTitleText(
-                text = title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(12.dp)
-                ) {
-                    enumValues<T>().forEach { status ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = ColorPainter(toColor(status)),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(16.dp)
-                                    .clip(RoundedCornerShape(2.dp))
-                            )
-                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                            Text(text = "${stringResource(toResource(status))}: ${data[status]}")
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-                PieChart(
-                    pieChartData = PieChartData(data.map { entry ->
-                        PieChartData.Slice(value = entry.value.toFloat(), color = toColor(entry.key))
-                    }),
-                    modifier = Modifier
-                        .size(150.dp)
-                        .padding(12.dp),
-                    sliceDrawer = SimpleSliceDrawer(sliceThickness = 50f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatsBar(
-    title: String,
-    placeholder: String,
-    data: List<IntByString>
-) {
-    val colorGenerator = RandomColor()
-
-    OutlinedSurface(modifier = Modifier.fillMaxWidth()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            SectionTitleText(
-                text = title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            )
-            if (data.isEmpty()) {
-                PlaceholderText(
-                    text = placeholder,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    BarChart(
-                        barChartData = BarChartData(data.map { elem ->
-                            BarChartData.Bar(
-                                value = elem.count.toFloat(),
-                                color = Color(colorGenerator.getColor()),
-                                label = elem.field
-                            )
-                        }),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .padding(12.dp),
-                        yAxisDrawer = SimpleYAxisDrawer(
-                            labelRatio = 5, // Base step is 0.2, so 0.2 * 5 -> steps of 1 unit
-                            labelTextColor = MaterialTheme.colors.onBackground,
-                            labelValueFormatter = { value -> NumberFormat.getIntegerInstance().format(value) },
-                            axisLineColor = MaterialTheme.colors.onBackground,
-                            axisLineThickness = 2.dp
-                        ),
-                        xAxisDrawer = SimpleXAxisDrawer(
-                            axisLineColor = MaterialTheme.colors.onBackground,
-                            axisLineThickness = 2.dp
-                        ),
-                        labelDrawer = SimpleValueDrawer(
-                            labelTextColor = MaterialTheme.colors.onBackground
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
 fun SectionTitleText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = MaterialTheme.typography.subtitle1,
+        style = MaterialTheme.typography.titleMedium,
         modifier = modifier,
         textAlign = TextAlign.Center
     )
@@ -211,12 +87,13 @@ fun SectionTitleText(text: String, modifier: Modifier = Modifier) {
 fun PlaceholderText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
         textAlign = TextAlign.Center,
         modifier = modifier
     )
 }
 
+// TODO Too many parameters, gotta refactor this somehow
 @Composable
 fun ProfileScreenContent(
     profileName: Flow<String?>,
@@ -243,20 +120,34 @@ fun ProfileScreenContent(
         horizontalAlignment = LookAndFeel.FieldColumnHorizontalAlignment,
         verticalArrangement = LookAndFeel.FieldColumnVerticalArrangement
     ) {
-        val tabNames = listOf("Profile", "Stats")
+        val tabNames = listOf(
+            stringResource(R.string.profile_tab_profile),
+            stringResource(R.string.profile_tab_stats)
+        )
         val selectedTab = rememberSaveable { mutableStateOf(0) }
 
-        TabRow(
+        ScrollableTabRow(
             selectedTabIndex = selectedTab.value,
-            modifier = Modifier
-                .clip(RoundedCornerShape(25))
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            backgroundColor = MaterialTheme.colors.surface
+            containerColor = MaterialTheme.colorScheme.surface,
+            indicator = {
+                Box {}
+            },
+            divider = {}
         ) {
             tabNames.forEachIndexed { index, name ->
+                val selected = selectedTab.value == index
+
                 Tab(
-                    selected = selectedTab.value == index,
+                    selected = selected,
                     onClick = { selectedTab.value = index },
+                    modifier = if (selected) Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.secondary)
+                    else Modifier
+                        .clip(RoundedCornerShape(25))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    selectedContentColor = MaterialTheme.colorScheme.onSecondary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ) {
                     Text(
                         text = name,
@@ -264,6 +155,9 @@ fun ProfileScreenContent(
                             .clip(RoundedCornerShape(25))
                             .padding(vertical = 8.dp)
                     )
+                }
+                if (index != tabNames.lastIndex) {
+                    Spacer(modifier = Modifier)
                 }
             }
         }
@@ -298,16 +192,23 @@ private fun ActionDialog(
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
     ) {
-        Surface() {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            shape = LookAndFeel.DialogSurfaceShape
+        ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
                     text = stringResource(R.string.profile_image_action_heading),
-                    style = MaterialTheme.typography.subtitle1
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Spacer(modifier = Modifier.padding(vertical = 4.dp))
                 Row(
@@ -315,38 +216,39 @@ private fun ActionDialog(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    IconButton(
-                        onClick = onCameraButtonClick,
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        IconButton(onClick = onCameraButtonClick) {
                             Icon(
                                 imageVector = Icons.Default.CameraAlt,
-                                contentDescription = "",
-                                modifier = Modifier.size(40.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.profile_image_action_camera),
-                                style = MaterialTheme.typography.caption
+                                contentDescription = stringResource(R.string.profile_image_action_camera),
+                                modifier = Modifier.fillMaxSize()
                             )
                         }
+                        Text(
+                            text = stringResource(R.string.profile_image_action_camera),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
-                    IconButton(
-                        onClick = onGalleryButtonClick,
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        IconButton(onClick = onGalleryButtonClick) {
                             Icon(
                                 imageVector = Icons.Default.Image,
-                                contentDescription = "",
-                                modifier = Modifier.size(40.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.profile_image_action_gallery),
-                                style = MaterialTheme.typography.caption
+                                contentDescription = stringResource(R.string.profile_image_action_gallery),
+                                modifier = Modifier.fillMaxSize()
                             )
                         }
+                        Text(
+                            text = stringResource(R.string.profile_image_action_gallery),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
+
                 }
             }
         }
@@ -449,66 +351,24 @@ private fun ProfilePart(
                 }
         )
         Spacer(modifier = Modifier.padding(vertical = 8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            var readOnly by remember { mutableStateOf(true) }
-
-            TextField(
+        BacklogTextField(
                 value = name ?: "",
-                onValueChange = { name = it },
-                label = { Text("Name") },
-                readOnly = readOnly
-            )
-            if (readOnly) {
-                IconButton(onClick = { readOnly = false }) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit name")
-                }
-            } else {
-                IconButton(
-                    onClick = {
-                        onNameChange(name ?: "")
-                        readOnly = true
-                    }
-                ) {
-                    Icon(imageVector = Icons.Default.Done, contentDescription = "Save name")
-                }
-            }
-        }
+                onValueChange = {
+                    name = it
+                    onNameChange(it)
+                },
+                label = { Text(stringResource(R.string.profile_name_field)) }
+        )
         Spacer(modifier = Modifier.padding(vertical = 4.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            var readOnly by remember { mutableStateOf(true) }
-
-            TextField(
+        BacklogTextField(
                 value = bio ?: "",
-                onValueChange = { bio = it },
+                onValueChange = {
+                    bio = it
+                    onBioChange(it)
+                },
                 modifier = Modifier.height(200.dp),
-                label = { Text("Bio") },
-                readOnly = readOnly
-            )
-            if (readOnly) {
-                IconButton(onClick = { readOnly = false }) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit bio")
-                }
-            } else {
-                IconButton(
-                    onClick = {
-                        onBioChange(bio ?: "")
-                        readOnly = true
-                    }
-                ) {
-                    Icon(imageVector = Icons.Default.Done, contentDescription = "Save bio")
-                }
-            }
-        }
+                label = { Text(stringResource(R.string.profile_bio_field)) }
+        )
     }
 }
 
@@ -516,7 +376,7 @@ private fun ProfilePart(
 @Composable
 fun ActionDialogPreview() {
     BacklogTheme() {
-        ActionDialog(onDismissRequest = { /*TODO*/ }, onCameraButtonClick = { /*TODO*/ }) {
+        ActionDialog(onDismissRequest = { }, onCameraButtonClick = { }) {
 
         }
     }
@@ -533,7 +393,10 @@ private fun StatsPart(
     completedGamesInCurrentYear: Int
 ) {
     // Assume we're inside a ColumnScope
-    SectionTitleText(text = stringResource(R.string.profile_games_subheading))
+    Text(
+        text = stringResource(R.string.profile_games_subheading),
+        style = MaterialTheme.typography.headlineSmall
+    )
     if (games.isEmpty()) {
         PlaceholderText(stringResource(R.string.profile_no_data))
     } else {
@@ -575,13 +438,13 @@ private fun StatsPart(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
-                        .background(color = MaterialTheme.colors.secondary)
+                        .background(color = MaterialTheme.colorScheme.secondary)
                         .size(64.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = completedGamesInCurrentYear.toString(),
-                        color = MaterialTheme.colors.onSecondary,
+                        color = MaterialTheme.colorScheme.onSecondary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp
                     )
@@ -592,11 +455,140 @@ private fun StatsPart(
 
     Spacer(modifier = Modifier.padding(vertical = 4.dp))
 
-    SectionTitleText(text = stringResource(R.string.profile_tasks_subheading))
+    Text(
+        text = stringResource(R.string.profile_tasks_subheading),
+        style = MaterialTheme.typography.headlineSmall
+    )
     if (tasks.isEmpty()) {
         PlaceholderText(text = stringResource(R.string.profile_tasks_no_data))
     } else {
         val counts: Map<TaskStatus, Int> = countOccurrences(tasks.map { it.task.status })
         StatusPie(counts, stringResource(R.string.profile_tasks_by_status_title), { it.toColor() }, { it.toResource() })
+    }
+}
+
+private inline fun <reified T : Enum<T>> countOccurrences(data: List<T>): Map<T, Int> {
+    return enumValues<T>().associateBy(
+        keySelector = { status -> status },
+        valueTransform = { status ->
+            data.filter { it == status }
+                .size
+        }
+    )
+}
+
+@Composable
+private inline fun <reified T : Enum<T>> StatusPie(
+    data: Map<T, Int>,
+    title: String,
+    crossinline toColor: (T) -> Color,
+    crossinline toResource: (T) -> Int
+) {
+    OutlinedSurface(modifier = Modifier.fillMaxWidth()) {
+        Column() {
+            SectionTitleText(
+                text = title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.padding(12.dp)
+                ) {
+                    enumValues<T>().forEach { status ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter = ColorPainter(toColor(status)),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .clip(RoundedCornerShape(50))
+                            )
+                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                            Text(
+                                text = "${stringResource(toResource(status))}   ${data[status]}",
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+                PieChart(
+                    pieChartData = PieChartData(data.map { entry ->
+                        PieChartData.Slice(value = entry.value.toFloat(), color = toColor(entry.key))
+                    }),
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(12.dp),
+                    sliceDrawer = SimpleSliceDrawer(sliceThickness = 50f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatsBar(
+    title: String,
+    placeholder: String,
+    data: List<IntByString>
+) {
+    val colorGenerator = RandomColor()
+
+    OutlinedSurface(modifier = Modifier.fillMaxWidth()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            SectionTitleText(
+                text = title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            )
+            if (data.isEmpty()) {
+                PlaceholderText(
+                    text = placeholder,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    BarChart(
+                        barChartData = BarChartData(data.map { elem ->
+                            BarChartData.Bar(
+                                value = elem.count.toFloat(),
+                                color = Color(colorGenerator.getColor()),
+                                label = elem.field
+                            )
+                        }),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .padding(12.dp),
+                        yAxisDrawer = SimpleYAxisDrawer(
+                            labelRatio = 5, // Base step is 0.2, so 0.2 * 5 -> steps of 1 unit
+                            labelTextColor = MaterialTheme.colorScheme.onBackground,
+                            labelValueFormatter = { value -> NumberFormat.getIntegerInstance().format(value) },
+                            axisLineColor = MaterialTheme.colorScheme.onBackground,
+                            axisLineThickness = 2.dp
+                        ),
+                        xAxisDrawer = SimpleXAxisDrawer(
+                            axisLineColor = MaterialTheme.colorScheme.onBackground,
+                            axisLineThickness = 2.dp
+                        ),
+                        labelDrawer = SimpleValueDrawer(
+                            labelTextColor = MaterialTheme.colorScheme.onBackground
+                        )
+                    )
+                }
+            }
+        }
     }
 }
